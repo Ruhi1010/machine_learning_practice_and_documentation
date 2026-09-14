@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NumPy: The Complete Note | Ruhi Practice Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0b1020; --bg-alt: #11182d; --card: #151d36; --cell-bg: #10172b; --cell-border: #26345a; --border: #202b4a;
+    --text: #eef2ff; --text-dim: #a9b5d6; --text-faint: #6f7da3;
+    --accent: #8b5cf6; --accent-soft: rgba(139,92,246,.14);
+    --teal: #22d3ee; --teal-soft: rgba(34,211,238,.10);
+    --purple: #c084fc; --purple-soft: rgba(192,132,252,.10);
+    --red: #fb7185; --red-soft: rgba(251,113,133,.10);
+    --shadow: rgba(2,6,23,.65);
+  }
+  html[data-theme="light"]{
+    --bg: #f6f7ff; --bg-alt: #edf0ff; --card: #ffffff; --cell-bg: #f3f5ff; --cell-border: #d9def2; --border: #e1e5f5;
+    --text: #171b35; --text-dim: #59627f; --text-faint: #7b84a2;
+    --accent: #6d28d9; --accent-soft: rgba(109,40,217,.09);
+    --teal: #0891b2; --teal-soft: rgba(8,145,178,.08);
+    --purple: #9333ea; --purple-soft: rgba(147,51,234,.08);
+    --red: #e11d48; --red-soft: rgba(225,29,72,.08);
+    --shadow: rgba(50,60,100,.14);
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    background: var(--bg); color: var(--text);
+    font-family:'Manrope', sans-serif; line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    transition: background-color .35s ease, color .35s ease;
+  }
+  .mono{ font-family:'JetBrains Mono', monospace; }
+  ::selection{ background: var(--accent-soft); color: var(--accent); }
+
+  #progress-bar{
+    position: fixed; top:0; left:0; height:3px; width:0%;
+    background: linear-gradient(90deg, var(--accent), var(--teal));
+    z-index: 200; transition: width .1s ease-out;
+  }
+  #theme-toggle{
+    position: fixed; top: 18px; right: 20px; z-index: 150;
+    width: 42px; height: 42px; border-radius: 50%;
+    background: var(--card); border: 1px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; box-shadow: 0 8px 20px var(--shadow);
+    transition: transform .2s ease, border-color .2s ease;
+  }
+  #theme-toggle:hover{ border-color: var(--accent); transform: scale(1.06); }
+  #theme-toggle svg{ width:19px; height:19px; }
+  #back-to-top{
+    position: fixed; bottom: 24px; right: 20px; z-index: 150;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--accent); border:none; color:#14161b;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; box-shadow: 0 8px 20px var(--shadow);
+    opacity:0; pointer-events:none; transition: opacity .25s ease, transform .2s ease;
+  }
+  #back-to-top.show{ opacity:1; pointer-events:auto; }
+  #back-to-top:hover{ transform: translateY(-3px); }
+
+  .wrap{ max-width: 900px; margin:0 auto; padding: 0 24px; }
+  section{ padding: 100px 0; }
+
+  #hero{ padding-top: 130px; text-align:center; }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace; font-size:13px; letter-spacing:.14em;
+    text-transform:uppercase; color: var(--accent); margin-bottom:20px;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+  }
+  .eyebrow::before, .eyebrow::after{ content:""; width:26px; height:1px; background: var(--accent); opacity:.5; }
+  h1.hero-title{ font-size: clamp(36px, 6vw, 56px); font-weight:800; letter-spacing:-.02em; line-height:1.1; margin-bottom:22px; }
+  .hero-title .hl{ color: var(--accent); }
+  .hero-sub{ font-size:18px; color: var(--text-dim); max-width:600px; margin:0 auto 40px; }
+  .hero-stats{ display:flex; justify-content:center; gap: 36px; flex-wrap:wrap; }
+  .hero-stat .num{ font-family:'JetBrains Mono', monospace; font-size:24px; font-weight:700; color:var(--teal); }
+  .hero-stat .lbl{ font-size:12.5px; color: var(--text-faint); text-transform:uppercase; letter-spacing:.06em; }
+
+  #toc .hero-sub{ margin-bottom: 46px; }
+  .toc-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:14px; }
+  .toc-card{
+    background: var(--card); border:1px solid var(--border); border-radius:14px;
+    padding: 20px 20px 18px; text-decoration:none; color:var(--text);
+    display:flex; flex-direction:column; gap:8px;
+    transition: border-color .2s ease, transform .2s ease; position: relative;
+  }
+  .toc-card.ready:hover{ border-color: var(--accent); transform: translateY(-3px); }
+  .toc-card.locked{ opacity:.5; }
+  .toc-num{ font-family:'JetBrains Mono', monospace; font-size:12px; color: var(--text-faint); }
+  .toc-title{ font-size:14.5px; font-weight:700; }
+  .toc-desc{ font-size:12.5px; color: var(--text-dim); }
+  .toc-pill{ position:absolute; top:16px; right:16px; font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.04em; padding:3px 9px; border-radius:999px; text-transform:uppercase; }
+  .toc-pill.ready{ background: var(--teal-soft); color: var(--teal); }
+  .toc-pill.soon{ background: var(--border); color: var(--text-faint); }
+
+  .chapter{ border-top:1px solid var(--border); scroll-margin-top: 30px; }
+  .ch-meta{ display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+  .ch-eyebrow{ font-family:'JetBrains Mono', monospace; font-size:12px; letter-spacing:.1em; text-transform:uppercase; color: var(--accent); }
+  .ch-badge{ font-family:'JetBrains Mono', monospace; font-size:11px; color: var(--text-faint); border:1px solid var(--border); padding:3px 10px; border-radius:999px; }
+  h2.ch-title{ font-size: clamp(28px, 4vw, 38px); font-weight:800; letter-spacing:-.01em; margin-bottom:18px; }
+  .step-label{ font-family:'JetBrains Mono', monospace; font-size:11.5px; letter-spacing:.08em; text-transform:uppercase; color: var(--text-faint); margin: 40px 0 12px; display:flex; align-items:center; gap:10px; }
+  .step-label::before{ content:""; width:14px; height:1px; background: var(--text-faint); }
+  p.body-text{ color: var(--text-dim); font-size:16px; max-width: 660px; margin-bottom:16px; }
+  strong.emph{ color: var(--text); }
+
+  .info-card{ border-radius:12px; padding:20px 22px; margin: 18px 0; border-left:3px solid; font-size:14.5px; }
+  .info-card .info-label{ font-family:'JetBrains Mono', monospace; font-size:11.5px; letter-spacing:.06em; text-transform:uppercase; margin-bottom:8px; display:block; font-weight:700; }
+  .info-card p{ color: var(--text-dim); }
+  .info-card.remember{ background: var(--teal-soft); border-color: var(--teal); }
+  .info-card.remember .info-label{ color: var(--teal); }
+  .info-card.mistake{ background: var(--red-soft); border-color: var(--red); }
+  .info-card.mistake .info-label{ color: var(--red); }
+  .info-card.insight{ background: var(--accent-soft); border-color: var(--accent); }
+  .info-card.insight .info-label{ color: var(--accent); }
+  .info-card.tip{ background: var(--purple-soft); border-color: var(--purple); }
+  .info-card.tip .info-label{ color: var(--purple); }
+  .info-card.usecase{ background: var(--teal-soft); border-color: var(--teal); }
+  .info-card.usecase .info-label{ color: var(--teal); }
+
+  .code-block{ background: var(--cell-bg); border:1px solid var(--cell-border); border-radius:12px; overflow:hidden; margin: 18px 0; }
+  .code-head{ display:flex; align-items:center; justify-content:space-between; padding:10px 16px; background: var(--bg-alt); border-bottom:1px solid var(--cell-border); }
+  .code-head .left{ display:flex; align-items:center; gap:10px; }
+  .code-dots{ display:flex; gap:6px; }
+  .code-dots span{ width:8px; height:8px; border-radius:50%; background: var(--border); }
+  .code-lang{ font-family:'JetBrains Mono', monospace; font-size:11px; color: var(--text-faint); }
+  .code-actions{ display:flex; gap:8px; }
+  .code-btn{ font-family:'JetBrains Mono', monospace; font-size:11px; color: var(--text-dim); background:transparent; border:1px solid var(--border); border-radius:7px; padding:5px 11px; cursor:pointer; transition: all .15s ease; }
+  .code-btn:hover{ border-color: var(--accent); color: var(--accent); }
+  .code-btn.run-btn{ color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+  pre.code-body{ padding:18px 20px; font-family:'JetBrains Mono', monospace; font-size:13.5px; overflow-x:auto; white-space:pre; }
+  .kw{ color: var(--purple); } .str{ color: var(--teal); } .fn{ color:#7fb4ff; } .cmt{ color: var(--text-faint); }
+  html[data-theme="light"] .fn{ color:#2563b0; }
+  .code-output{ display:none; border-top:1px solid var(--cell-border); }
+  .code-output.show{ display:block; animation: fadeIn .3s ease; }
+  .code-output .out-label{ padding:8px 20px 0; font-family:'JetBrains Mono', monospace; font-size:10.5px; color: var(--text-faint); text-transform:uppercase; letter-spacing:.06em; }
+  .code-output pre{ padding:8px 20px 16px; font-family:'JetBrains Mono', monospace; font-size:13.5px; color: var(--text-dim); white-space:pre; }
+  @keyframes fadeIn{ from{opacity:0;} to{opacity:1;} }
+
+  /* ---------- Jupyter-style DataFrame table ---------- */
+  .df-wrap{ overflow-x:auto; border-radius:12px; border:1px solid var(--cell-border); margin: 16px 0; }
+  .df-table{ border-collapse:collapse; width:100%; font-family:'JetBrains Mono', monospace; font-size:12.5px; }
+  .df-table thead th{ background: var(--bg-alt); color: var(--text-dim); padding:10px 16px; border-bottom:2px solid var(--cell-border); font-weight:600; white-space:nowrap; }
+  .df-table th.df-index-h{ background: var(--bg-alt); }
+  .df-table td{ padding:9px 16px; border-bottom:1px solid var(--cell-border); color: var(--text); white-space:nowrap; }
+  .df-table td.df-index{ color: var(--text-faint); font-weight:600; background: var(--bg-alt); }
+  .df-table tbody tr:hover td{ background: var(--accent-soft); }
+  .df-table td.df-nan{ color: var(--red); font-style:italic; }
+  .df-table .anatomy-highlight{ background: var(--accent-soft) !important; outline:2px solid var(--accent); outline-offset:-2px; }
+  .df-caption{ font-size:12px; color: var(--text-faint); margin-top:-8px; margin-bottom:16px; }
+
+  .task-list{ list-style:none; padding:0; margin:14px 0; }
+  .task-list li{ padding:9px 0 9px 26px; position:relative; color: var(--text-dim); font-size:14px; border-bottom:1px solid var(--border); }
+  .task-list li:last-child{ border-bottom:none; }
+  .task-list li::before{ content:"\2192"; position:absolute; left:0; color: var(--accent); font-family:'JetBrains Mono', monospace; }
+
+  /* ---------- tabs / toggle buttons ---------- */
+  .tabs{ display:flex; gap:8px; margin: 16px 0; flex-wrap:wrap; }
+  .tab-btn{ font-family:'JetBrains Mono', monospace; font-size:12.5px; background:transparent; border:1px solid var(--border); color:var(--text-dim); padding:8px 16px; border-radius:999px; cursor:pointer; transition: all .15s ease; }
+  .tab-btn:hover{ border-color: var(--accent); color: var(--text); }
+  .tab-btn.active{ background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+  /* ---------- playground ---------- */
+  .playground{ background: var(--card); border:1px solid var(--border); border-radius:16px; padding:26px 26px 24px; margin: 22px 0; }
+  .pg-controls{ display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; margin-bottom:6px; }
+  .pg-field{ display:flex; flex-direction:column; }
+  .pg-field label{ font-family:'JetBrains Mono', monospace; font-size:10.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:7px; }
+  .pg-field select, .pg-field input{ background: var(--bg-alt); border:1px solid var(--border); color: var(--text); padding:9px 12px; border-radius:8px; font-family:'JetBrains Mono', monospace; font-size:13px; width:150px; }
+
+  /* ---------- comparison table ---------- */
+  .dim-table{ width:100%; border-collapse:collapse; margin:20px 0; font-size:13.5px; }
+  .dim-table th, .dim-table td{ text-align:left; padding:10px 14px; border-bottom:1px solid var(--border); }
+  .dim-table th{ color: var(--text-faint); font-family:'JetBrains Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:.05em; font-weight:600; }
+  .dim-table td.dim-name{ color: var(--teal); font-family:'JetBrains Mono', monospace; font-weight:600; }
+
+  /* ---------- architecture diagram ---------- */
+  .diagram-shell{ background: var(--card); border:1px solid var(--border); border-radius: 20px; padding: 44px 30px; margin: 24px 0; overflow:hidden; }
+  .eco-svg{ width:100%; height:auto; display:block; }
+  .eco-node rect{ fill: var(--cell-bg); stroke: var(--cell-border); stroke-width:1.5; transition: stroke .3s ease; }
+  .eco-node text{ fill: var(--text); font-family:'JetBrains Mono', monospace; }
+  .eco-node.visible rect{ stroke: var(--accent); }
+  .eco-node{ opacity:0; transform: translateY(14px); transition: opacity .6s ease, transform .6s ease; }
+  .eco-node.visible{ opacity:1; transform: translateY(0); }
+  .eco-path.flow{ stroke: var(--accent); stroke-width:2; fill:none; stroke-dasharray: 300; stroke-dashoffset: 300; transition: stroke-dashoffset 1.2s ease; }
+  .eco-path.flow.visible{ stroke-dashoffset: 0; }
+
+  /* ---------- quiz ---------- */
+  .quiz-block{ background: var(--card); border:1px solid var(--border); border-radius:14px; padding:26px 26px 24px; margin: 30px 0; }
+  .quiz-q{ font-weight:700; font-size:15.5px; margin-bottom:16px; }
+  .quiz-opts{ display:flex; flex-direction:column; gap:9px; }
+  .quiz-opt{ text-align:left; background: var(--bg-alt); border:1px solid var(--border); color: var(--text); padding:12px 16px; border-radius:9px; font-size:14px; cursor:pointer; font-family:'Manrope', sans-serif; transition: all .15s ease; }
+  .quiz-opt:hover{ border-color: var(--accent); }
+  .quiz-opt.correct{ border-color: var(--teal); background: var(--teal-soft); color: var(--teal); }
+  .quiz-opt.wrong{ border-color: var(--red); background: var(--red-soft); color: var(--red); }
+  .quiz-feedback{ margin-top:14px; font-size:13.5px; color: var(--text-dim); display:none; }
+  .quiz-feedback.show{ display:block; animation: fadeIn .3s ease; }
+
+  .prop-grid{ display:flex; flex-wrap:wrap; gap:10px; margin: 16px 0; }
+  .prop-chip{ font-family:'JetBrains Mono', monospace; font-size:12.5px; background: var(--cell-bg); border:1px solid var(--cell-border); border-radius:9px; padding:9px 14px; color: var(--text-dim); }
+  .prop-chip b{ color: var(--teal); }
+
+  @keyframes rowEnter{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
+
+  /* ---------- split-apply-combine visual (section 7) ---------- */
+  .sac-flow{ display:flex; align-items:center; gap:20px; flex-wrap:wrap; margin:20px 0; padding:24px; background: var(--card); border:1px solid var(--border); border-radius:14px; }
+  .sac-stage{ text-align:center; flex:1; min-width:110px; }
+  .sac-icon{ font-size:26px; margin-bottom:8px; }
+  .sac-label{ font-family:'JetBrains Mono', monospace; font-size:13px; font-weight:700; color: var(--text); }
+  .sac-sub{ font-size:11.5px; color: var(--text-faint); margin-top:2px; }
+  .sac-arrow{ font-size:20px; color: var(--text-faint); }
+  .sac-stage.pulse{ animation: sacPulse .5s ease; }
+  @keyframes sacPulse{ 0%{ transform:scale(1); } 50%{ transform:scale(1.05); box-shadow:0 0 0 4px var(--accent-soft); border-radius:12px; } 100%{ transform:scale(1); } }
+
+  .quiz-tag{ font-family:'JetBrains Mono', monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color: var(--accent); background: var(--accent-soft); padding:3px 10px; border-radius:999px; display:inline-block; margin-bottom:10px; }
+  .quiz-code{ background: var(--bg-alt); border:1px solid var(--border); border-radius:8px; padding:12px 14px; font-family:'JetBrains Mono', monospace; font-size:13px; margin:10px 0 16px; white-space:pre; overflow-x:auto; color: var(--text-dim); }
+
+  .insight-qa{ display:flex; flex-direction:column; gap:12px; margin:20px 0; }
+  .qa-item{ background: var(--card); border:1px solid var(--border); border-radius:12px; padding:16px 20px; }
+  .qa-q{ font-size:14px; color: var(--text-dim); margin-bottom:8px; }
+  .qa-a{ font-family:'JetBrains Mono', monospace; font-size:14.5px; color: var(--teal); font-weight:600; }
+
+  .roadmap-flow{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:26px 0; }
+  .roadmap-step{ font-family:'JetBrains Mono', monospace; font-size:12px; background: var(--card); border:1px solid var(--border); padding:8px 14px; border-radius:999px; color: var(--text-dim); }
+  .roadmap-arrow{ color: var(--text-faint); font-size:13px; }
+  .roadmap-step.final{ background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight:700; }
+  .pull-quote{ font-size: clamp(20px, 3vw, 26px); font-weight:700; line-height:1.4; color: var(--text); border-left:3px solid var(--accent); padding-left:22px; margin: 30px 0; }
+
+  footer{ text-align:center; padding: 50px 24px 70px; color: var(--text-faint); font-family:'JetBrains Mono', monospace; font-size:12px; border-top:1px solid var(--border); }
+
+  @media (max-width: 760px){
+    .toc-grid{ grid-template-columns: 1fr; }
+    section{ padding: 64px 0; }
+    #hero{ padding-top: 100px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+  <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></svg>
+</button>
+<button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<section id="hero">
+  <div class="wrap">
+    <div class="eyebrow">✦ Ruhi Practice Hub ✦</div>
+    <h1 class="hero-title">NumPy — the engine<br>under every <span class="hl">array</span></h1>
+    <p class="hero-sub">Before Pandas, there's NumPy. One running dataset — a week of temperatures across five cities — carried through every section: build it, reshape it, slice it, question it.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">7</div><div class="lbl">Core Sections</div></div>
+      <div class="hero-stat"><div class="num">1</div><div class="lbl">Dataset, Start to Finish</div></div>
+      <div class="hero-stat"><div class="num">20+</div><div class="lbl">Practice Questions</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="toc">
+  <div class="wrap">
+    <h2 class="ch-title" style="text-align:center;">7 sections, one continuous array</h2>
+    <div class="toc-grid">
+      <a href="#s1" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">01</span><span class="toc-title">Why Do We Need NumPy?</span><span class="toc-desc">From Python lists to fast, uniform arrays.</span></a>
+      <a href="#s2" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">02</span><span class="toc-title">Creating Arrays</span><span class="toc-desc">array(), arange, zeros/ones, linspace, random.</span></a>
+      <a href="#s3" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">03</span><span class="toc-title">Indexing &amp; Slicing</span><span class="toc-desc">Positions, slices, and boolean masks.</span></a>
+      <a href="#s4" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">04</span><span class="toc-title">Operations &amp; Broadcasting</span><span class="toc-desc">Vectorized math and shape-matching rules.</span></a>
+      <a href="#s5" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">05</span><span class="toc-title">Reshaping &amp; Combining</span><span class="toc-desc">reshape, flatten, stack &amp; split.</span></a>
+      <a href="#s6" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">06</span><span class="toc-title">Aggregations &amp; Axes</span><span class="toc-desc">sum, mean, std &mdash; and what axis actually means.</span></a>
+      <a href="#s7" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">07</span><span class="toc-title">Linear Algebra &amp; Random</span><span class="toc-desc">dot, matmul, transpose, seeded randomness.</span></a>
+      <a href="#workflow" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">＋</span><span class="toc-title">Real-World Workflow</span><span class="toc-desc">The full case study, start to finish.</span></a>
+      <a href="#practice" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">＋</span><span class="toc-title">Practice Questions</span><span class="toc-desc">20+ questions with instant feedback.</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" id="s1">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Section 01</span><span class="ch-badge">Foundations</span></div>
+    <h2 class="ch-title">Why Do We Need NumPy?</h2>
+
+    <div class="step-label">The problem</div>
+    <p class="body-text">Python lists can hold numbers just fine. Here's a week of Tokyo temperatures, stored the "list" way:</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">the_list_way.py</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button></div></div>
+      <pre class="code-body">tokyo_temps = [18, 19, 21, 20, 22, 23, 21]
+<span class="cmt"># convert every value to Fahrenheit...</span>
+fahrenheit = []
+<span class="kw">for</span> t <span class="kw">in</span> tokyo_temps:
+    fahrenheit.append(t * <span class="str">9</span>/<span class="str">5</span> + <span class="str">32</span>)</pre>
+    </div>
+    <p class="body-text">That's a manual loop for one simple conversion, on one city, for one week. Now imagine five cities, 365 days, and needing that same math every single time.</p>
+    <ul class="task-list" style="margin-bottom:20px;">
+      <li>Element-wise math needs an explicit loop — Python never does it "in bulk."</li>
+      <li>Lists can silently mix types, so there's no guarantee every value is even a number.</li>
+      <li>Nested lists (a list of lists) are a clumsy stand-in for a real grid — rows and columns.</li>
+      <li>There's no built-in idea of "shape," so bugs like a missing city or an extra day slip through.</li>
+      <li>Pure-Python loops don't scale — at real data sizes, they're dramatically slower than they need to be.</li>
+    </ul>
+
+    <div class="info-card insight">
+      <span class="info-label">Data Science Insight</span>
+      <p>NumPy (Numerical Python) gives Python a fast, fixed-type, N-dimensional array, plus <strong class="emph">vectorized</strong> operations — the same math applied to every element at once, without writing the loop yourself.</p>
+    </div>
+
+    <div class="step-label">List vs NumPy array</div>
+    <table class="dim-table">
+      <tr><th>Feature</th><th>Python List</th><th>NumPy Array</th></tr>
+      <tr><td class="dim-name">Structure</td><td>Flat, unordered container</td><td>Fixed-shape, same-type grid (N-D)</td></tr>
+      <tr><td class="dim-name">Data Types</td><td>Mixed, any type per element</td><td>One dtype for the whole array</td></tr>
+      <tr><td class="dim-name">Element-wise Math</td><td>Manual loop required</td><td>Vectorized — <span class="mono">arr * 2</span> just works</td></tr>
+      <tr><td class="dim-name">Memory Layout</td><td>Array of pointers to objects</td><td>Contiguous block, fixed-size elements</td></tr>
+      <tr><td class="dim-name">Speed at Scale</td><td>Slows down fast</td><td>Backed by compiled C loops</td></tr>
+      <tr><td class="dim-name">Shape Awareness</td><td>None — nested lists only</td><td>Native <span class="mono">.shape</span>, <span class="mono">.ndim</span></td></tr>
+    </table>
+
+    <div class="step-label">Where NumPy sits</div>
+    <p class="body-text">NumPy is the layer between raw Python and everything built for numerical work on top of it — Pandas included.</p>
+    <div class="diagram-shell">
+      <svg class="eco-svg" viewBox="0 0 780 260" xmlns="http://www.w3.org/2000/svg">
+        <path class="eco-path flow" d="M 140 55 L 140 105" />
+        <path class="eco-path flow" d="M 140 105 L 390 105 L 390 155" />
+        <path class="eco-path flow" d="M 640 105 L 390 105" />
+        <path class="eco-path flow" d="M 390 205 L 390 155" />
+        <g class="eco-node" data-n="1"><rect x="70" y="18" width="140" height="40" rx="10"/><text x="140" y="43" font-size="13.5" text-anchor="middle" font-weight="600">Python</text></g>
+        <g class="eco-node" data-n="2"><rect x="70" y="68" width="140" height="40" rx="10"/><text x="140" y="93" font-size="13.5" text-anchor="middle" font-weight="600">Lists</text></g>
+        <g class="eco-node" data-n="3"><rect x="320" y="118" width="140" height="40" rx="10"/><text x="390" y="143" font-size="13.5" text-anchor="middle" font-weight="600">NumPy</text></g>
+        <g class="eco-node" data-n="4"><rect x="570" y="68" width="140" height="40" rx="10"/><text x="640" y="93" font-size="12.5" text-anchor="middle" font-weight="600">Compiled C Loops</text></g>
+        <g class="eco-node" data-n="5"><rect x="320" y="205" width="140" height="40" rx="10"/><text x="390" y="230" font-size="12.5" text-anchor="middle" font-weight="600">Pandas, ML, Plots</text></g>
+      </svg>
+    </div>
+
+    <div class="step-label">Array anatomy — interactive</div>
+    <p class="body-text">Every array has a <strong class="emph">shape</strong> (rows &times; columns), a <strong class="emph">dtype</strong> (one type for every element), and axes. Click each part below.</p>
+    <div class="playground">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="showArrAnatomy('axis0', this)">Axis 0 (rows)</button>
+        <button class="tab-btn" onclick="showArrAnatomy('axis1', this)">Axis 1 (columns)</button>
+        <button class="tab-btn" onclick="showArrAnatomy('row', this)">A Row</button>
+        <button class="tab-btn" onclick="showArrAnatomy('col', this)">A Column</button>
+        <button class="tab-btn" onclick="showArrAnatomy('cell', this)">A Single Element</button>
+      </div>
+      <div id="anatomy-arr"></div>
+      <p class="body-text" id="anatomy-arr-desc" style="margin-top:14px; margin-bottom:0;"></p>
+    </div>
+
+    <div class="step-label">Meet the dataset</div>
+    <p class="body-text">Every section from here on reuses one small array — daily temperatures (&deg;C) across five cities, one week. Here it is, in full, before we've done anything to it:</p>
+    <div id="teaser-arr"></div>
+    <p class="df-caption">A 5&times;7 array &mdash; 5 cities (rows) &times; 7 days (columns). Built formally in Section 2.</p>
+
+    <div class="step-label">Installing &amp; importing</div>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">terminal</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button></div></div>
+      <pre class="code-body">pip install numpy</pre>
+    </div>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body"><span class="kw">import</span> numpy <span class="kw">as</span> np</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>(no output — numpy is now ready to use as np)</pre></div>
+    </div>
+    <p class="body-text"><span class="mono">np</span> is the universal convention — every doc page, course, and Stack Overflow answer assumes it.</p>
+
+    <div class="info-card mistake">
+      <span class="info-label">Common Mistake</span>
+      <p>Treating a NumPy array like a Python list that happens to be faster. Arrays are fixed-type and fixed-shape by design — appending to one in a loop, the way you'd grow a list, defeats the whole point and is slower than a list would have been.</p>
+    </div>
+
+    <div class="info-card usecase">
+      <span class="info-label">Real-World Use Case</span>
+      <p>Every image is a NumPy array of pixel values, every audio clip a NumPy array of samples, and every Pandas DataFrame is built from NumPy arrays underneath. Learning arrays first is what makes all three make sense.</p>
+    </div>
+
+    <div class="step-label">Practice challenge</div>
+    <div class="quiz-block">
+      <div class="quiz-q">Quick check: what's the main thing NumPy adds on top of a Python list?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'qs1')">The ability to store any type of value</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'qs1')">Fixed-type, shape-aware storage with vectorized math</button>
+      </div>
+      <div class="quiz-feedback" id="qs1-feedback"></div>
+    </div>
+
+    <div class="step-label">Summary</div>
+    <p class="body-text">You now know why NumPy exists and what "shape" and "dtype" mean. Next: actually building this array — and every other shape you'll need — from scratch.</p>
+  </div>
+</section>
+
+<section class="chapter" id="s2">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Section 02</span><span class="ch-badge">Live builder</span></div>
+    <h2 class="ch-title">Creating Arrays</h2>
+
+    <div class="step-label">Why do we need this</div>
+    <p class="body-text">Arrays come from three places: converting existing Python data, generating a pattern (zeros, ranges, evenly spaced points), or sampling randomly. Every project starts with one of these.</p>
+
+    <div class="step-label">From a Python list</div>
+    <p class="body-text">The most direct route — wrap a list (or list of lists) in <span class="mono">np.array()</span>.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body">tokyo = [<span class="str">18</span>, <span class="str">19</span>, <span class="str">21</span>, <span class="str">20</span>, <span class="str">22</span>, <span class="str">23</span>, <span class="str">21</span>]
+arr = np.array(tokyo)
+<span class="kw">print</span>(arr, arr.dtype, arr.shape)</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>[18 19 21 20 22 23 21] int64 (7,)</pre></div>
+    </div>
+    <p class="body-text">A list of lists becomes a 2-D array — one row per inner list, as long as every inner list is the same length.</p>
+
+    <div class="info-card mistake">
+      <span class="info-label">Common Mistake</span>
+      <p>Passing lists of different lengths into <span class="mono">np.array()</span>. Modern NumPy refuses to guess and raises an error — it needs every row to be the same length, unlike a plain Python list of lists.</p>
+    </div>
+
+    <div class="step-label">Generating patterns &amp; sampling — interactive</div>
+    <p class="body-text">Pick a creation function and see exactly what it produces at the given size.</p>
+    <div class="playground">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="createArr('zeros', this)">np.zeros()</button>
+        <button class="tab-btn" onclick="createArr('ones', this)">np.ones()</button>
+        <button class="tab-btn" onclick="createArr('arange', this)">np.arange()</button>
+        <button class="tab-btn" onclick="createArr('linspace', this)">np.linspace()</button>
+        <button class="tab-btn" onclick="createArr('random', this)">np.random.randint()</button>
+      </div>
+      <div class="pg-controls">
+        <div class="pg-field"><label>Rows</label><input type="number" id="create-rows" value="1" min="1" max="6" oninput="reCreate()"></div>
+        <div class="pg-field"><label>Cols / Count</label><input type="number" id="create-cols" value="7" min="1" max="10" oninput="reCreate()"></div>
+      </div>
+      <div class="code-block" style="margin-top:14px;"><pre class="code-body" id="create-code" style="padding:14px 18px; font-size:13px;"></pre></div>
+      <div id="create-out"></div>
+    </div>
+
+    <div class="step-label">The temperature dataset — for real this time</div>
+    <p class="body-text">This is the 5&times;7 array every later section builds on: 5 cities (rows), 7 days (columns), degrees Celsius.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button></div></div>
+      <pre class="code-body">cities = [<span class="str">"Tokyo"</span>, <span class="str">"Cairo"</span>, <span class="str">"Oslo"</span>, <span class="str">"Lima"</span>, <span class="str">"Nairobi"</span>]
+temps = np.array([
+    [<span class="str">18</span>, <span class="str">19</span>, <span class="str">21</span>, <span class="str">20</span>, <span class="str">22</span>, <span class="str">23</span>, <span class="str">21</span>],   <span class="cmt"># Tokyo</span>
+    [<span class="str">29</span>, <span class="str">31</span>, <span class="str">30</span>, <span class="str">33</span>, <span class="str">32</span>, <span class="str">30</span>, <span class="str">28</span>],   <span class="cmt"># Cairo</span>
+    [<span class="str">4</span>,  <span class="str">3</span>,  <span class="str">5</span>,  <span class="str">2</span>,  <span class="str">6</span>,  <span class="str">4</span>,  <span class="str">3</span>],    <span class="cmt"># Oslo</span>
+    [<span class="str">17</span>, <span class="str">18</span>, <span class="str">16</span>, <span class="str">19</span>, <span class="str">18</span>, <span class="str">17</span>, <span class="str">19</span>],   <span class="cmt"># Lima</span>
+    [<span class="str">24</span>, <span class="str">23</span>, <span class="str">25</span>, <span class="str">24</span>, <span class="str">26</span>, <span class="str">25</span>, <span class="str">24</span>],   <span class="cmt"># Nairobi</span>
+])
+<span class="kw">print</span>(temps.shape, temps.dtype, temps.ndim)</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>(5, 7) int64 2</pre></div>
+    </div>
+    <div id="dataset-arr"></div>
+    <p class="df-caption">Rows 0&ndash;4 = Tokyo, Cairo, Oslo, Lima, Nairobi. Columns 0&ndash;6 = Monday through Sunday.</p>
+
+    <div class="step-label">Array properties at a glance</div>
+    <div class="prop-grid" id="props-grid"></div>
+
+    <div class="info-card tip">
+      <span class="info-label">Pro Tip</span>
+      <p><span class="mono">np.random.seed(n)</span> makes "random" output reproducible — the same seed always produces the same numbers. Useful for demos, tests, and anywhere you need a result someone else can double-check.</p>
+    </div>
+
+    <div class="step-label">Practice challenge</div>
+    <div class="quiz-block">
+      <div class="quiz-q">What does <span class="mono">np.linspace(0, 10, 5)</span> return?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'qs2')">5 random numbers between 0 and 10</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'qs2')">5 evenly spaced numbers from 0 to 10, inclusive</button>
+      </div>
+      <div class="quiz-feedback" id="qs2-feedback"></div>
+    </div>
+
+    <div class="step-label">Summary</div>
+    <p class="body-text">You can now build an array from data you already have, or generate one from scratch. Next: pulling specific pieces back out of it.</p>
+  </div>
+</section>
+
+<section class="chapter" id="s3">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Section 03</span><span class="ch-badge">Live inspector</span></div>
+    <h2 class="ch-title">Indexing &amp; Slicing</h2>
+
+    <div class="step-label">Basic indexing</div>
+    <p class="body-text">A 2-D array is indexed <span class="mono">[row, col]</span> — one pair of brackets, comma-separated, not two separate brackets like nested lists.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body"><span class="cmt"># Cairo (row 1), Wednesday (col 2)</span>
+<span class="kw">print</span>(temps[<span class="str">1</span>, <span class="str">2</span>])
+<span class="cmt"># the whole Cairo row</span>
+<span class="kw">print</span>(temps[<span class="str">1</span>])
+<span class="cmt"># every city's Wednesday temperature</span>
+<span class="kw">print</span>(temps[:, <span class="str">2</span>])</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>30
+[29 31 30 33 32 30 28]
+[21 30  5 16 25]</pre></div>
+    </div>
+
+    <div class="step-label">Position &amp; slice explorer — interactive</div>
+    <p class="body-text">Pick a row and a column (or leave one as "all") and watch exactly what gets selected.</p>
+    <div class="playground">
+      <div class="pg-controls">
+        <div class="pg-field"><label>Row</label>
+          <select id="idx-row" onchange="applyIndex()">
+            <option value="all">: (all rows)</option>
+            <option value="0">0 — Tokyo</option>
+            <option value="1">1 — Cairo</option>
+            <option value="2">2 — Oslo</option>
+            <option value="3">3 — Lima</option>
+            <option value="4" selected>4 — Nairobi</option>
+          </select>
+        </div>
+        <div class="pg-field"><label>Column</label>
+          <select id="idx-col" onchange="applyIndex()">
+            <option value="all">: (all cols)</option>
+            <option value="0">0 — Mon</option>
+            <option value="1">1 — Tue</option>
+            <option value="2" selected>2 — Wed</option>
+            <option value="3">3 — Thu</option>
+            <option value="4">4 — Fri</option>
+            <option value="5">5 — Sat</option>
+            <option value="6">6 — Sun</option>
+          </select>
+        </div>
+      </div>
+      <div id="idx-arr"></div>
+      <p class="body-text" id="idx-result" style="margin-top:10px; margin-bottom:0;"></p>
+    </div>
+
+    <div class="step-label">Slicing a range</div>
+    <p class="body-text">Slices work like Python list slices — <span class="mono">start:stop</span>, stop excluded — but now along any axis.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body"><span class="cmt"># first 3 days, for the first 2 cities</span>
+<span class="kw">print</span>(temps[<span class="str">0</span>:<span class="str">2</span>, <span class="str">0</span>:<span class="str">3</span>])</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>[[18 19 21]
+ [29 31 30]]</pre></div>
+    </div>
+
+    <div class="info-card mistake">
+      <span class="info-label">Common Mistake</span>
+      <p>Assuming a slice of an array is a copy, the way it can feel with a list. A NumPy slice is a <strong class="emph">view</strong> — modifying it modifies the original array too. Use <span class="mono">.copy()</span> when you actually need an independent version.</p>
+    </div>
+
+    <div class="step-label">Boolean masking — interactive</div>
+    <p class="body-text">A boolean mask keeps only the elements where a condition is true — no loop required.</p>
+    <div class="playground">
+      <div class="pg-controls">
+        <div class="pg-field"><label>Condition</label>
+          <select id="mask-op" onchange="applyMask()">
+            <option value=">">greater than</option>
+            <option value="<">less than</option>
+            <option value=">=">at least</option>
+          </select>
+        </div>
+        <div class="pg-field"><label>Value (&deg;C)</label><input type="number" id="mask-val" value="25" oninput="applyMask()"></div>
+      </div>
+      <div class="code-block" style="margin-top:6px;"><pre class="code-body" id="mask-code" style="padding:12px 16px; font-size:13px;"></pre></div>
+      <div id="mask-stats" class="prop-grid" style="margin-top:0;"></div>
+      <div id="mask-arr"></div>
+    </div>
+
+    <div class="info-card usecase">
+      <span class="info-label">Real-World Use Case</span>
+      <p>Boolean masking is exactly how you'd flag a heatwave: <span class="mono">temps[temps &gt; 30]</span> pulls out every reading above 30&deg;C, across every city and day, in one line.</p>
+    </div>
+
+    <div class="step-label">Practice challenge</div>
+    <div class="quiz-block">
+      <div class="quiz-q"><span class="mono">temps[2, :]</span> selects...</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'qs3')">Column 2 — Wednesday, every city</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'qs3')">Row 2 — every day for Oslo</button>
+      </div>
+      <div class="quiz-feedback" id="qs3-feedback"></div>
+    </div>
+
+    <div class="step-label">Summary</div>
+    <p class="body-text">You can now pull out any element, row, column, slice, or condition-matched subset. Next: doing math across the whole array at once.</p>
+  </div>
+</section>
+
+<section class="chapter" id="s4">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Section 04</span><span class="ch-badge">Live calculator</span></div>
+    <h2 class="ch-title">Array Operations &amp; Broadcasting</h2>
+
+    <div class="step-label">Vectorized math</div>
+    <p class="body-text">Every arithmetic operator applies element-wise, automatically — this is the whole reason NumPy exists.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body"><span class="cmt"># Celsius -> Fahrenheit, for every city and day, no loop</span>
+fahrenheit = temps * <span class="str">9</span>/<span class="str">5</span> + <span class="str">32</span>
+<span class="kw">print</span>(fahrenheit[<span class="str">0</span>])  <span class="cmt"># Tokyo's week, in Fahrenheit</span></pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>[64.4 66.2 69.8 68.  71.6 73.4 69.8]</pre></div>
+    </div>
+
+    <div class="step-label">Elementwise calculator — interactive</div>
+    <p class="body-text">Apply an operation to the whole temperature array and watch every value update at once.</p>
+    <div class="playground">
+      <div class="pg-controls">
+        <div class="pg-field"><label>Operation</label>
+          <select id="op-select" onchange="applyOp()">
+            <option value="add">+</option>
+            <option value="sub">&minus;</option>
+            <option value="mul" selected>&times;</option>
+            <option value="div">&divide;</option>
+            <option value="gt">&gt; (comparison)</option>
+          </select>
+        </div>
+        <div class="pg-field"><label>Scalar</label><input type="number" id="op-val" value="2" step="0.5" oninput="applyOp()"></div>
+      </div>
+      <div class="code-block" style="margin-top:6px;"><pre class="code-body" id="op-code" style="padding:12px 16px; font-size:13px;"></pre></div>
+      <div id="op-arr"></div>
+    </div>
+
+    <div class="info-card insight">
+      <span class="info-label">Data Science Insight</span>
+      <p>Comparison operators (<span class="mono">&gt;</span>, <span class="mono">==</span>) are also vectorized — they don't return one True/False, they return a full array of them, which is exactly what feeds boolean masking from Section 3.</p>
+    </div>
+
+    <div class="step-label">Broadcasting</div>
+    <p class="body-text">Broadcasting is how NumPy applies an operation between arrays of <em>different</em> shapes — by "stretching" the smaller one, without actually copying data. A 1-D array of 7 day-offsets can be added to every row of the 5&times;7 grid at once.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body">correction = np.array([<span class="str">0</span>, <span class="str">0</span>, <span class="str">1</span>, <span class="str">1</span>, <span class="str">1</span>, <span class="str">0</span>, <span class="str">-1</span>])  <span class="cmt"># shape (7,)</span>
+adjusted = temps + correction  <span class="cmt"># temps is (5, 7) -> broadcasts across every row</span>
+<span class="kw">print</span>(adjusted.shape)</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>(5, 7)</pre></div>
+    </div>
+    <table class="dim-table">
+      <tr><th>Array A</th><th>Array B</th><th>Compatible?</th><th>Why</th></tr>
+      <tr><td class="dim-name">(5, 7)</td><td>(7,)</td><td style="color:var(--teal);">Yes</td><td>B stretches across all 5 rows</td></tr>
+      <tr><td class="dim-name">(5, 7)</td><td>(5, 1)</td><td style="color:var(--teal);">Yes</td><td>B stretches across all 7 columns</td></tr>
+      <tr><td class="dim-name">(5, 7)</td><td>()</td><td style="color:var(--teal);">Yes</td><td>A single scalar applies everywhere</td></tr>
+      <tr><td class="dim-name">(5, 7)</td><td>(3,)</td><td style="color:var(--red);">No</td><td>7 and 3 don't match, and neither is 1</td></tr>
+    </table>
+
+    <div class="info-card mistake">
+      <span class="info-label">Common Mistake</span>
+      <p>Assuming any two arrays can be combined. NumPy compares shapes from the <strong class="emph">right</strong>, dimension by dimension — each pair of dimensions must be equal, or one of them must be 1. Otherwise it raises a <span class="mono">ValueError</span>.</p>
+    </div>
+
+    <div class="step-label">Practice challenge</div>
+    <div class="quiz-block">
+      <div class="quiz-q">Can a <span class="mono">(5, 7)</span> array and a <span class="mono">(5, 1)</span> array be broadcast together?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'qs4')">Yes — the (5,1) array stretches across all 7 columns</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'qs4')">No — the second dimensions (7 and 1) don't match</button>
+      </div>
+      <div class="quiz-feedback" id="qs4-feedback"></div>
+    </div>
+
+    <div class="step-label">Summary</div>
+    <p class="body-text">You can now apply math across a whole array, and understand when two differently-shaped arrays can combine. Next: changing an array's shape entirely.</p>
+  </div>
+</section>
+
+<section class="chapter" id="s5">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Section 05</span><span class="ch-badge">Live reshaper</span></div>
+    <h2 class="ch-title">Reshaping, Stacking &amp; Splitting</h2>
+
+    <div class="step-label">Reshape</div>
+    <p class="body-text"><span class="mono">.reshape()</span> rearranges the same elements into a new shape — the total element count has to stay identical.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body">flat = temps.flatten()       <span class="cmt"># 35 elements, 1-D</span>
+weeks = flat.reshape(<span class="str">5</span>, <span class="str">7</span>)  <span class="cmt"># back to 5x7</span>
+<span class="kw">print</span>(flat.shape, <span class="str">"->"</span>, weeks.shape)</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>(35,) -> (5, 7)</pre></div>
+    </div>
+
+    <div class="step-label">Reshape playground — interactive</div>
+    <p class="body-text">The 35 flattened temperature values, reshaped live. Only shapes whose dimensions multiply to 35 will work — exactly like in real NumPy.</p>
+    <div class="playground">
+      <div class="pg-controls">
+        <div class="pg-field"><label>New Rows</label><input type="number" id="rs-rows" value="7" min="1" max="35" oninput="applyReshape()"></div>
+        <div class="pg-field"><label>New Cols</label><input type="number" id="rs-cols" value="5" min="1" max="35" oninput="applyReshape()"></div>
+      </div>
+      <div class="code-block" style="margin-top:6px;"><pre class="code-body" id="rs-code" style="padding:12px 16px; font-size:13px;"></pre></div>
+      <div id="rs-result"></div>
+    </div>
+
+    <div class="info-card tip">
+      <span class="info-label">Pro Tip</span>
+      <p>Pass <span class="mono">-1</span> for one dimension and NumPy figures it out: <span class="mono">flat.reshape(7, -1)</span> automatically becomes <span class="mono">(7, 5)</span>, since 35 &divide; 7 = 5.</p>
+    </div>
+
+    <div class="step-label">Stacking arrays</div>
+    <p class="body-text">A new city's readings — as a separate 1-D array — can be stacked onto the existing grid with <span class="mono">np.vstack()</span>.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body">berlin = np.array([<span class="str">14</span>, <span class="str">15</span>, <span class="str">13</span>, <span class="str">16</span>, <span class="str">15</span>, <span class="str">14</span>, <span class="str">13</span>])
+extended = np.vstack([temps, berlin])
+<span class="kw">print</span>(extended.shape)</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>(6, 7)</pre></div>
+    </div>
+    <table class="dim-table">
+      <tr><th>Function</th><th>Stacks along</th><th>Shape requirement</th></tr>
+      <tr><td class="dim-name">np.vstack()</td><td>New rows (axis 0)</td><td>Same number of columns</td></tr>
+      <tr><td class="dim-name">np.hstack()</td><td>New columns (axis 1)</td><td>Same number of rows</td></tr>
+      <tr><td class="dim-name">np.concatenate()</td><td>Any given axis</td><td>Matching on every other axis</td></tr>
+    </table>
+
+    <div class="step-label">Splitting arrays</div>
+    <p class="body-text"><span class="mono">np.split()</span> is the reverse — cut one array into several equal pieces.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body"><span class="cmt"># split the week into (Mon-Wed) and (Thu-Sun)</span>
+first_half, second_half = np.split(temps, [<span class="str">3</span>], axis=<span class="str">1</span>)
+<span class="kw">print</span>(first_half.shape, second_half.shape)</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>(5, 3) (5, 4)</pre></div>
+    </div>
+
+    <div class="info-card mistake">
+      <span class="info-label">Common Mistake</span>
+      <p>Calling <span class="mono">.reshape()</span> with dimensions that don't multiply to the original element count. 35 elements can become <span class="mono">(5,7)</span>, <span class="mono">(7,5)</span>, or <span class="mono">(35,)</span> &mdash; never <span class="mono">(5,6)</span>. NumPy raises a <span class="mono">ValueError</span> rather than guessing.</p>
+    </div>
+
+    <div class="step-label">Practice challenge</div>
+    <div class="quiz-block">
+      <div class="quiz-q">A 35-element array is reshaped with <span class="mono">.reshape(5, -1)</span>. What's the resulting shape?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'qs5')">(5, 5) — NumPy just guesses 5</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'qs5')">(5, 7) — NumPy computes 35 &divide; 5</button>
+      </div>
+      <div class="quiz-feedback" id="qs5-feedback"></div>
+    </div>
+
+    <div class="step-label">Summary</div>
+    <p class="body-text">You can now reshape, stack, and split arrays freely. Next: collapsing an array down into summary numbers.</p>
+  </div>
+</section>
+
+<section class="chapter" id="s6">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Section 06</span><span class="ch-badge">Live aggregator</span></div>
+    <h2 class="ch-title">Aggregations, Axes &amp; Statistics</h2>
+
+    <div class="step-label">Aggregating the whole array</div>
+    <p class="body-text">With no axis specified, an aggregation collapses every element down to one number.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body"><span class="kw">print</span>(temps.mean(), temps.max(), temps.min())</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>19.4 33 2</pre></div>
+    </div>
+
+    <div class="step-label">The axis argument</div>
+    <p class="body-text"><span class="mono">axis=0</span> collapses <em>down</em> the rows (one result per column). <span class="mono">axis=1</span> collapses <em>across</em> the columns (one result per row). It's the single most-confused idea in NumPy — the interactive board below makes it concrete.</p>
+
+    <div class="playground">
+      <div class="pg-controls">
+        <div class="pg-field"><label>Function</label>
+          <select id="agg-fn" onchange="applyAgg()">
+            <option value="mean">mean</option>
+            <option value="sum">sum</option>
+            <option value="max">max</option>
+            <option value="min">min</option>
+            <option value="std">std</option>
+          </select>
+        </div>
+        <div class="pg-field"><label>Axis</label>
+          <select id="agg-axis" onchange="applyAgg()">
+            <option value="none">None (whole array)</option>
+            <option value="0">0 — per day, across cities</option>
+            <option value="1" selected>1 — per city, across days</option>
+          </select>
+        </div>
+      </div>
+      <div class="code-block" style="margin-top:6px;"><pre class="code-body" id="agg-code" style="padding:12px 16px; font-size:13px;"></pre></div>
+      <div id="agg-result"></div>
+    </div>
+
+    <div class="info-card insight">
+      <span class="info-label">Data Science Insight</span>
+      <p>A useful trick: axis is the dimension that <em>disappears</em>. <span class="mono">temps</span> is (5, 7); <span class="mono">temps.mean(axis=1)</span> makes the 7 vanish, leaving one mean per city — shape (5,).</p>
+    </div>
+
+    <div class="step-label">argmax / argmin</div>
+    <p class="body-text">These return the <em>position</em> of the extreme value, not the value itself — essential for answering "which city" or "which day."</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body">hottest_city_idx = temps.mean(axis=<span class="str">1</span>).argmax()
+<span class="kw">print</span>(cities[hottest_city_idx])</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>Cairo</pre></div>
+    </div>
+
+    <div class="info-card mistake">
+      <span class="info-label">Common Mistake</span>
+      <p>Mixing up which axis means "per row" and which means "per column." If the result is confusing, check the output <em>shape</em> first — it always tells you exactly which dimension survived.</p>
+    </div>
+
+    <div class="step-label">Practice challenge</div>
+    <div class="quiz-block">
+      <div class="quiz-q">To get one average temperature per city (collapsing the 7 days), which call is correct?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'qs6')">temps.mean(axis=0)</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'qs6')">temps.mean(axis=1)</button>
+      </div>
+      <div class="quiz-feedback" id="qs6-feedback"></div>
+    </div>
+
+    <div class="step-label">Summary</div>
+    <p class="body-text">You can now summarize an array along any axis, and find exactly where an extreme value sits. Next: matrix math and controlled randomness.</p>
+  </div>
+</section>
+
+<section class="chapter" id="s7">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Section 07</span><span class="ch-badge">Live playground</span></div>
+    <h2 class="ch-title">Linear Algebra &amp; Random Sampling</h2>
+
+    <div class="step-label">Dot products &amp; matrix multiplication</div>
+    <p class="body-text">A weighted score — say, combining a week's temperatures with a per-day importance weight — is exactly a dot product.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body">weekday_weight = np.array([<span class="str">1</span>, <span class="str">1</span>, <span class="str">1</span>, <span class="str">1</span>, <span class="str">1</span>, <span class="str">0.5</span>, <span class="str">0.5</span>])
+weighted_scores = temps @ weekday_weight   <span class="cmt"># (5,7) @ (7,) -> (5,)</span>
+<span class="kw">print</span>(weighted_scores)</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>[122.  184.   23.5 106.  146.5]</pre></div>
+    </div>
+    <p class="body-text"><span class="mono">@</span> is shorthand for <span class="mono">np.matmul()</span> — for two 2-D matrices, it does real matrix multiplication, not element-wise multiplication.</p>
+
+    <div class="step-label">Dot product playground — interactive</div>
+    <p class="body-text">Give two same-length vectors and see the dot product computed step by step.</p>
+    <div class="playground">
+      <div class="pg-controls">
+        <div class="pg-field"><label>Vector A</label><input type="text" id="dot-a" value="2,4,6" oninput="applyDot()"></div>
+        <div class="pg-field"><label>Vector B</label><input type="text" id="dot-b" value="1,3,5" oninput="applyDot()"></div>
+      </div>
+      <div id="dot-out" class="body-text" style="margin-top:14px;"></div>
+    </div>
+
+    <div class="step-label">Transpose</div>
+    <p class="body-text"><span class="mono">.T</span> flips rows and columns — the 5&times;7 city&times;day grid becomes a 7&times;5 day&times;city grid, same data, new orientation.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body"><span class="kw">print</span>(temps.shape, <span class="str">"->"</span>, temps.T.shape)</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>(5, 7) -> (7, 5)</pre></div>
+    </div>
+
+    <div class="step-label">Random sampling, reproducibly</div>
+    <p class="body-text">The same seed always produces the same "random" array — try a few seeds below.</p>
+    <div class="playground">
+      <div class="pg-controls">
+        <div class="pg-field"><label>Seed</label><input type="number" id="rand-seed" value="7" oninput="applyRandom()"></div>
+      </div>
+      <div class="code-block" style="margin-top:6px;"><pre class="code-body" id="rand-code" style="padding:12px 16px; font-size:13px;"></pre></div>
+      <div id="rand-out"></div>
+    </div>
+
+    <div class="info-card usecase">
+      <span class="info-label">Real-World Use Case</span>
+      <p>Reproducible randomness is how machine learning experiments stay comparable — shuffling data, splitting into train/test sets, or initializing weights, all seeded so results can be reproduced exactly.</p>
+    </div>
+
+    <div class="step-label">Practice challenge</div>
+    <div class="quiz-block">
+      <div class="quiz-q">For two 2-D matrices, what does <span class="mono">@</span> do that <span class="mono">*</span> doesn't?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'qs7')">Performs real matrix multiplication, not element-wise multiplication</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'qs7')">Nothing — they're interchangeable for arrays</button>
+      </div>
+      <div class="quiz-feedback" id="qs7-feedback"></div>
+    </div>
+
+    <div class="step-label">Summary</div>
+    <p class="body-text">You now have the full core toolkit: creating, indexing, operating on, reshaping, aggregating, and doing linear algebra on arrays. Next: all seven, applied end-to-end.</p>
+  </div>
+</section>
+
+<section class="chapter" id="workflow">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Case Study</span><span class="ch-badge">End to end</span></div>
+    <h2 class="ch-title">The Full Workflow, Start to Finish</h2>
+    <p class="body-text">Same dataset, one continuous pipeline — every step is something you already built in this note, just chained together the way a real analysis actually looks.</p>
+
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">full_workflow.py</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button></div></div>
+      <pre class="code-body"><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cmt"># 1. Build the array</span>
+cities = [<span class="str">"Tokyo"</span>, <span class="str">"Cairo"</span>, <span class="str">"Oslo"</span>, <span class="str">"Lima"</span>, <span class="str">"Nairobi"</span>]
+temps = np.array([
+    [<span class="str">18</span>, <span class="str">19</span>, <span class="str">21</span>, <span class="str">20</span>, <span class="str">22</span>, <span class="str">23</span>, <span class="str">21</span>],
+    [<span class="str">29</span>, <span class="str">31</span>, <span class="str">30</span>, <span class="str">33</span>, <span class="str">32</span>, <span class="str">30</span>, <span class="str">28</span>],
+    [<span class="str">4</span>,  <span class="str">3</span>,  <span class="str">5</span>,  <span class="str">2</span>,  <span class="str">6</span>,  <span class="str">4</span>,  <span class="str">3</span>],
+    [<span class="str">17</span>, <span class="str">18</span>, <span class="str">16</span>, <span class="str">19</span>, <span class="str">18</span>, <span class="str">17</span>, <span class="str">19</span>],
+    [<span class="str">24</span>, <span class="str">23</span>, <span class="str">25</span>, <span class="str">24</span>, <span class="str">26</span>, <span class="str">25</span>, <span class="str">24</span>],
+])
+
+<span class="cmt"># 2. Inspect</span>
+<span class="kw">print</span>(temps.shape, temps.dtype)
+
+<span class="cmt"># 3. Convert units</span>
+fahrenheit = temps * <span class="str">9</span>/<span class="str">5</span> + <span class="str">32</span>
+
+<span class="cmt"># 4. Per-city weekly average (axis=1 collapses the days)</span>
+city_avg = temps.mean(axis=<span class="str">1</span>)
+
+<span class="cmt"># 5. Per-day average across all cities (axis=0 collapses the cities)</span>
+day_avg = temps.mean(axis=<span class="str">0</span>)
+
+<span class="cmt"># 6. Flag a heatwave with a boolean mask</span>
+heatwave = temps > <span class="str">28</span>
+
+<span class="cmt"># 7. Rank cities by average temperature</span>
+ranking = np.argsort(city_avg)[::-<span class="str">1</span>]
+ranked_cities = [cities[i] <span class="kw">for</span> i <span class="kw">in</span> ranking]
+
+<span class="cmt"># 8. Reshape for a downstream model expecting a flat feature vector</span>
+features = temps.flatten()</pre>
+    </div>
+
+    <div class="step-label">Insights — computed live from this note's real dataset</div>
+    <div class="insight-qa">
+      <div class="qa-item"><div class="qa-q">Which city has the hottest weekly average?</div><div class="qa-a" id="qa-1"></div></div>
+      <div class="qa-item"><div class="qa-q">Which city has the most consistent temperatures (lowest std)?</div><div class="qa-a" id="qa-2"></div></div>
+      <div class="qa-item"><div class="qa-q">Which day of the week runs coolest, on average, across all five cities?</div><div class="qa-a" id="qa-3"></div></div>
+      <div class="qa-item"><div class="qa-q">How many readings exceed 28&deg;C, and where?</div><div class="qa-a" id="qa-4"></div></div>
+      <div class="qa-item">
+        <div class="qa-q">Full city ranking by weekly average temperature</div>
+        <div id="qa-5-table"></div>
+      </div>
+      <div class="qa-item"><div class="qa-q">What's the overall temperature range (max &minus; min) across the entire dataset?</div><div class="qa-a" id="qa-6"></div></div>
+    </div>
+    <p class="body-text" style="font-size:13px; color:var(--text-faint);">Every answer above is computed live from this exact 5&times;7 array &mdash; not scripted text. Re-derive it yourself against the code above.</p>
+  </div>
+</section>
+
+<section class="chapter" id="practice">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Practice</span><span class="ch-badge">20 questions</span></div>
+    <h2 class="ch-title">Practice Questions</h2>
+    <p class="body-text">Twenty questions, spanning everything from Section 1 to Section 7. Instant feedback, every time.</p>
+
+    <div class="quiz-block"><span class="quiz-tag">Predict the Output</span>
+      <div class="quiz-q">What does this print?</div>
+      <pre class="quiz-code">arr = np.array([<span class="str">10</span>, <span class="str">20</span>, <span class="str">30</span>])
+<span class="fn">print</span>(arr[<span class="str">1</span>])</pre>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p1')">20</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p1')">30</button>
+      </div>
+      <div class="quiz-feedback" id="p1-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Predict the Output</span>
+      <div class="quiz-q">What is <span class="mono">np.array([1, 2, 3.0]).dtype</span>?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p2')">float64 — one stray float upcasts the whole array</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p2')">int64, since most values are integers</button>
+      </div>
+      <div class="quiz-feedback" id="p2-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Predict the Output</span>
+      <div class="quiz-q">For a 1-D array of length 10, how many elements does <span class="mono">arr[2:6]</span> return?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p3')">4 elements (indices 2, 3, 4, 5)</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p3')">5 elements (indices 2 through 6)</button>
+      </div>
+      <div class="quiz-feedback" id="p3-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Select the Correct Function</span>
+      <div class="quiz-q">Which creates 10 evenly spaced values between 0 and 1, inclusive?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p4')">np.linspace(0, 1, 10)</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p4')">np.arange(0, 1, 10)</button>
+      </div>
+      <div class="quiz-feedback" id="p4-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Select the Correct Function</span>
+      <div class="quiz-q">Which returns the position of the largest value, not the value itself?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p5')">argmax()</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p5')">max()</button>
+      </div>
+      <div class="quiz-feedback" id="p5-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Select the Correct Function</span>
+      <div class="quiz-q">Best way to make "random" output reproducible across runs?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p6')">np.random.seed(n) before generating</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p6')">Running the cell twice</button>
+      </div>
+      <div class="quiz-feedback" id="p6-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Find the Error</span>
+      <div class="quiz-q">What's wrong here?</div>
+      <pre class="quiz-code">a = np.array([[<span class="str">1</span>, <span class="str">2</span>], [<span class="str">3</span>, <span class="str">4</span>, <span class="str">5</span>]])</pre>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p7')">Rows have different lengths — NumPy needs a rectangular shape</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p7')">Nothing, this works fine as a 2x2 array</button>
+      </div>
+      <div class="quiz-feedback" id="p7-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Find the Error</span>
+      <div class="quiz-q">This raises a ValueError. Why?</div>
+      <pre class="quiz-code">a = np.arange(<span class="str">10</span>)
+a.reshape(<span class="str">3</span>, <span class="str">4</span>)</pre>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p8')">3 &times; 4 = 12, but the array only has 10 elements</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p8')">reshape() can't be called on the result of arange()</button>
+      </div>
+      <div class="quiz-feedback" id="p8-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Find the Error</span>
+      <div class="quiz-q">A (4, 3) array and a (4,) array are added and it fails. What's the fix?</div>
+      <pre class="quiz-code">a = np.ones((<span class="str">4</span>, <span class="str">3</span>))
+b = np.array([<span class="str">1</span>, <span class="str">2</span>, <span class="str">3</span>, <span class="str">4</span>])
+a + b  <span class="cmt"># ValueError</span></pre>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p9')">b needs shape (3,) to broadcast across columns, or (4,1) to broadcast across rows</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p9')">Arrays of different shapes can never be added</button>
+      </div>
+      <div class="quiz-feedback" id="p9-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Complete the Code</span>
+      <div class="quiz-q">Fill in the blank to keep only values greater than 20:</div>
+      <pre class="quiz-code">arr[arr ____ <span class="str">20</span>]</pre>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p10')">&gt;</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p10')">.greater(</button>
+      </div>
+      <div class="quiz-feedback" id="p10-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Complete the Code</span>
+      <div class="quiz-q">Fill in the blank to get one sum per row of a 2-D array:</div>
+      <pre class="quiz-code">arr.sum(axis=____)</pre>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p11')">1</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p11')">0</button>
+      </div>
+      <div class="quiz-feedback" id="p11-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Shape &amp; Axis</span>
+      <div class="quiz-q">A (5, 7) array has <span class="mono">.sum(axis=0)</span> called on it. What's the result's shape?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p12')">(7,) — the 5 rows collapse away</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p12')">(5,) — the 7 columns collapse away</button>
+      </div>
+      <div class="quiz-feedback" id="p12-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Views vs Copies</span>
+      <div class="quiz-q"><span class="mono">sub = arr[0:3]</span> is modified in place. What happens to <span class="mono">arr</span>?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p13')">arr changes too — slicing returns a view, not a copy</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p13')">arr is unaffected — slices are always independent</button>
+      </div>
+      <div class="quiz-feedback" id="p13-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Boolean Masking</span>
+      <div class="quiz-q">What does <span class="mono">arr[~(arr &gt; 20)]</span> select?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p14')">Every value that is 20 or less</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p14')">Every value greater than 20</button>
+      </div>
+      <div class="quiz-feedback" id="p14-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Broadcasting</span>
+      <div class="quiz-q">Can a (5, 7) array and a (1, 7) array be combined?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p15')">Yes — the (1,7) row stretches down all 5 rows</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p15')">No — the first dimensions (5 and 1) don't match</button>
+      </div>
+      <div class="quiz-feedback" id="p15-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Stacking</span>
+      <div class="quiz-q">Two arrays of shape (3, 4) are combined with <span class="mono">np.hstack()</span>. What's the result shape?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p16')">(3, 8) — columns are joined side by side</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p16')">(6, 4) — rows are stacked on top of each other</button>
+      </div>
+      <div class="quiz-feedback" id="p16-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Data Types</span>
+      <div class="quiz-q">Why might <span class="mono">arr.astype(int)</span> silently give wrong-looking results on a float array?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p17')">It truncates the decimal part instead of rounding</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p17')">astype() always raises an error on floats</button>
+      </div>
+      <div class="quiz-feedback" id="p17-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Matrix Multiplication</span>
+      <div class="quiz-q">For 2-D arrays A and B, what's the difference between <span class="mono">A * B</span> and <span class="mono">A @ B</span>?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p18')">* is element-wise; @ is real matrix multiplication</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p18')">They always produce identical results</button>
+      </div>
+      <div class="quiz-feedback" id="p18-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Aggregation</span>
+      <div class="quiz-q">Why might <span class="mono">arr.std()</span> matter more than <span class="mono">arr.mean()</span> when comparing two cities' weekly temperatures?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p19')">std shows how much temperatures vary day to day, not just the average level</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p19')">std and mean always give the same information</button>
+      </div>
+      <div class="quiz-feedback" id="p19-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Reshaping</span>
+      <div class="quiz-q">What does <span class="mono">arr.reshape(-1, 1)</span> do to a 1-D array of length 7?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p20')">Turns it into a (7, 1) column vector</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p20')">Turns it into a (1, 7) row vector</button>
+      </div>
+      <div class="quiz-feedback" id="p20-feedback"></div>
+    </div>
+  </div>
+</section>
+
+<section id="final-summary">
+  <div class="wrap" style="text-align:center;">
+    <h2 class="ch-title">From Lists to Arrays</h2>
+    <div class="roadmap-flow" style="justify-content:center;">
+      <span class="roadmap-step">Why NumPy</span><span class="roadmap-arrow">&rarr;</span>
+      <span class="roadmap-step">Creating Arrays</span><span class="roadmap-arrow">&rarr;</span>
+      <span class="roadmap-step">Indexing &amp; Slicing</span><span class="roadmap-arrow">&rarr;</span>
+      <span class="roadmap-step">Operations &amp; Broadcasting</span><span class="roadmap-arrow">&rarr;</span>
+      <span class="roadmap-step">Reshaping</span><span class="roadmap-arrow">&rarr;</span>
+      <span class="roadmap-step">Aggregations</span><span class="roadmap-arrow">&rarr;</span>
+      <span class="roadmap-step final">Linear Algebra &amp; Random</span>
+    </div>
+    <p class="pull-quote" style="text-align:left; display:inline-block;">NumPy turns loops into vectorized math — the foundation every other data tool in Python is built on.</p>
+    <p class="body-text" style="margin:0 auto;">This is exactly the layer Pandas sits on top of — every DataFrame column is a NumPy array underneath, so everything learned here carries forward directly.</p>
+  </div>
+</section>
+
+<footer>Ruhi Practice Hub &mdash; NumPy: The Complete Note &middot; All 7 sections, workflow, and 20+ practice questions built. The core concepts and theme template taken from Sheryians AI School</footer>
+
+<script>
+  // theme toggle
+  const sunPath = 'M12 4.5V2M12 22v-2.5M4.5 12H2M22 12h-2.5M5.6 5.6 4 4M20 20l-1.6-1.6M18.4 5.6 20 4M4 20l1.6-1.6M12 8a4 4 0 100 8 4 4 0 000-8z';
+  const moonPath = 'M21 12.8A9 9 0 1111.2 3 7 7 0 0021 12.8z';
+  const icon = document.getElementById('theme-icon');
+  function setIcon(theme){ icon.innerHTML = '<path d="' + (theme === 'dark' ? sunPath : moonPath) + '"/>'; }
+  setIcon('dark');
+  function toggleTheme(){
+    const html = document.documentElement;
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    setIcon(next);
+  }
+
+  // progress bar + back to top
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement;
+    const scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+    document.getElementById('progress-bar').style.width = scrolled + '%';
+    document.getElementById('back-to-top').classList.toggle('show', h.scrollTop > 600);
+  });
+
+  // architecture diagram reveal
+  const ecoNodes = document.querySelectorAll('.eco-node');
+  const ecoPaths = document.querySelectorAll('.eco-path');
+  const ecoObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting){
+        ecoNodes.forEach((n, i) => setTimeout(() => n.classList.add('visible'), i * 100));
+        ecoPaths.forEach((p, i) => setTimeout(() => p.classList.add('visible'), 200 + i * 100));
+        ecoObserver.disconnect();
+      }
+    });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('.diagram-shell').forEach(el => ecoObserver.observe(el));
+
+  // code block copy + run
+  function copyCode(btn){
+    const code = btn.closest('.code-block').querySelector('.code-body').innerText;
+    navigator.clipboard.writeText(code);
+    const old = btn.innerText;
+    btn.innerText = 'Copied';
+    setTimeout(() => btn.innerText = old, 1200);
+  }
+  function runCode(btn){
+    const output = btn.closest('.code-block').querySelector('.code-output');
+    if (output) output.classList.add('show');
+  }
+
+  // ---------- array grid renderer (reused by every section) ----------
+  function renderArr(containerId, data2d, rowLabels, colLabels){
+    const container = document.getElementById(containerId);
+    if (!container || !data2d.length){ if(container) container.innerHTML=''; return; }
+    const ncols = data2d[0].length;
+    colLabels = colLabels || Array.from({length: ncols}, (_, i) => i);
+    rowLabels = rowLabels || data2d.map((_, i) => i);
+    let html = '<div class="df-wrap"><table class="df-table"><thead><tr><th class="df-index-h"></th>';
+    colLabels.forEach((c, ci) => html += `<th data-col="${ci}" style="text-align:right;">${c}</th>`);
+    html += '</tr></thead><tbody>';
+    data2d.forEach((row, ri) => {
+      html += `<tr><td class="df-index" data-row="${ri}">${rowLabels[ri]}</td>`;
+      row.forEach((v, ci) => {
+        const isNan = (v === null || v === undefined || Number.isNaN(v));
+        const disp = isNan ? 'NaN' : (typeof v === 'number' ? (Number.isInteger(v) ? v : v.toFixed(2)) : v);
+        html += `<td class="df-cell${isNan ? ' df-nan' : ''}" data-row="${ri}" data-col="${ci}" style="text-align:right;">${disp}</td>`;
+      });
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+    container.querySelectorAll('tbody tr').forEach((tr, i) => {
+      tr.style.animation = `rowEnter .35s ease ${i * 0.03}s both`;
+    });
+  }
+  function renderText(containerId, text){
+    document.getElementById(containerId).innerHTML = `<div class="code-block"><pre class="code-body">${text}</pre></div>`;
+  }
+
+  // ---------- the running temperature dataset ----------
+  const cities = ['Tokyo', 'Cairo', 'Oslo', 'Lima', 'Nairobi'];
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const tempData = [
+    [18, 19, 21, 20, 22, 23, 21],
+    [29, 31, 30, 33, 32, 30, 28],
+    [4,  3,  5,  2,  6,  4,  3],
+    [17, 18, 16, 19, 18, 17, 19],
+    [24, 23, 25, 24, 26, 25, 24],
+  ];
+  const cityLabels = cities.map((c, i) => `${i} — ${c}`);
+
+  function mulberry32(seed){
+    return function(){
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  // ---------- s1: array anatomy ----------
+  function clearArrHighlights(){
+    document.querySelectorAll('#anatomy-arr td, #anatomy-arr th').forEach(el => el.classList.remove('anatomy-highlight'));
+  }
+  function showArrAnatomy(part, btn){
+    btn.closest('.playground').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    clearArrHighlights();
+    const desc = document.getElementById('anatomy-arr-desc');
+    if (part === 'axis0'){
+      document.querySelectorAll('#anatomy-arr .df-index, #anatomy-arr .df-index-h').forEach(el => el.classList.add('anatomy-highlight'));
+      desc.innerHTML = '<strong class="emph">Axis 0</strong> runs down the rows — here, one row per city. Aggregating with <span class="mono">axis=0</span> collapses this direction.';
+    } else if (part === 'axis1'){
+      document.querySelectorAll('#anatomy-arr thead th:not(.df-index-h)').forEach(el => el.classList.add('anatomy-highlight'));
+      desc.innerHTML = '<strong class="emph">Axis 1</strong> runs across the columns — here, one column per day. Aggregating with <span class="mono">axis=1</span> collapses this direction.';
+    } else if (part === 'row'){
+      document.querySelectorAll('#anatomy-arr [data-row="1"]').forEach(el => el.classList.add('anatomy-highlight'));
+      desc.innerHTML = '<strong class="emph">A row</strong> — every day of one city\'s week, selected with <span class="mono">arr[1]</span>.';
+    } else if (part === 'col'){
+      document.querySelectorAll('#anatomy-arr [data-col="2"]').forEach(el => el.classList.add('anatomy-highlight'));
+      desc.innerHTML = '<strong class="emph">A column</strong> — every city\'s reading for one day, selected with <span class="mono">arr[:, 2]</span>.';
+    } else {
+      document.querySelectorAll('#anatomy-arr [data-row="1"][data-col="2"]').forEach(el => el.classList.add('anatomy-highlight'));
+      desc.innerHTML = '<strong class="emph">A single element</strong> — the intersection of one row and one column: <span class="mono">arr[1, 2]</span>.';
+    }
+  }
+
+  // ---------- s2: creation playground ----------
+  function reCreate(){
+    const active = document.querySelector('#s2 .tab-btn.active');
+    if (active) createArr(active.getAttribute('data-kind') || currentCreateKind, active);
+  }
+  let currentCreateKind = 'zeros';
+  function createArr(kind, btn){
+    currentCreateKind = kind;
+    btn.setAttribute('data-kind', kind);
+    document.querySelectorAll('#s2 .tab-btn').forEach(b => { b.classList.remove('active'); });
+    btn.classList.add('active');
+    const rows = Math.max(1, parseInt(document.getElementById('create-rows').value) || 1);
+    const cols = Math.max(1, parseInt(document.getElementById('create-cols').value) || 1);
+    let data, code;
+    if (kind === 'zeros'){
+      data = Array.from({length: rows}, () => Array.from({length: cols}, () => 0));
+      code = `np.zeros((${rows}, ${cols}))`;
+    } else if (kind === 'ones'){
+      data = Array.from({length: rows}, () => Array.from({length: cols}, () => 1));
+      code = `np.ones((${rows}, ${cols}))`;
+    } else if (kind === 'arange'){
+      const flat = Array.from({length: rows * cols}, (_, i) => i);
+      data = [];
+      for (let r = 0; r < rows; r++) data.push(flat.slice(r * cols, r * cols + cols));
+      code = `np.arange(${rows * cols}).reshape(${rows}, ${cols})`;
+    } else if (kind === 'linspace'){
+      const n = rows * cols;
+      const flat = Array.from({length: n}, (_, i) => n > 1 ? +(i * 10 / (n - 1)).toFixed(2) : 0);
+      data = [];
+      for (let r = 0; r < rows; r++) data.push(flat.slice(r * cols, r * cols + cols));
+      code = `np.linspace(0, 10, ${n}).reshape(${rows}, ${cols})`;
+    } else {
+      const rand = mulberry32(42);
+      data = Array.from({length: rows}, () => Array.from({length: cols}, () => Math.floor(rand() * 100)));
+      code = `np.random.randint(0, 100, size=(${rows}, ${cols}))`;
+    }
+    document.getElementById('create-code').innerText = code;
+    renderArr('create-out', data);
+  }
+
+  function renderDatasetAndProps(){
+    renderArr('anatomy-arr', tempData, cityLabels, days);
+    renderArr('teaser-arr', tempData, cityLabels, days);
+    renderArr('dataset-arr', tempData, cityLabels, days);
+    const flat = tempData.flat();
+    document.getElementById('props-grid').innerHTML =
+      `<div class="prop-chip">shape: <b>(5, 7)</b></div>` +
+      `<div class="prop-chip">ndim: <b>2</b></div>` +
+      `<div class="prop-chip">size: <b>${flat.length}</b></div>` +
+      `<div class="prop-chip">dtype: <b>int64</b></div>` +
+      `<div class="prop-chip">itemsize: <b>8 bytes</b></div>`;
+  }
+
+  // ---------- s3: index explorer ----------
+  function applyIndex(){
+    const rowSel = document.getElementById('idx-row').value;
+    const colSel = document.getElementById('idx-col').value;
+    renderArr('idx-arr', tempData, cityLabels, days);
+    let resultText;
+    if (rowSel !== 'all' && colSel !== 'all'){
+      document.querySelectorAll(`#idx-arr [data-row="${rowSel}"][data-col="${colSel}"]`).forEach(el => el.classList.add('anatomy-highlight'));
+      resultText = `<span class="mono">temps[${rowSel}, ${colSel}]</span> &rarr; <strong class="emph">${tempData[rowSel][colSel]}</strong> &deg;C (${cities[rowSel]}, ${days[colSel]})`;
+    } else if (rowSel !== 'all'){
+      document.querySelectorAll(`#idx-arr [data-row="${rowSel}"]`).forEach(el => el.classList.add('anatomy-highlight'));
+      resultText = `<span class="mono">temps[${rowSel}]</span> &rarr; <strong class="emph">[${tempData[rowSel].join(', ')}]</strong> &mdash; all of ${cities[rowSel]}'s week`;
+    } else if (colSel !== 'all'){
+      document.querySelectorAll(`#idx-arr [data-col="${colSel}"]`).forEach(el => el.classList.add('anatomy-highlight'));
+      const colVals = tempData.map(r => r[colSel]);
+      resultText = `<span class="mono">temps[:, ${colSel}]</span> &rarr; <strong class="emph">[${colVals.join(', ')}]</strong> &mdash; every city on ${days[colSel]}`;
+    } else {
+      resultText = 'Pick a row, a column, or both.';
+    }
+    document.getElementById('idx-result').innerHTML = resultText;
+  }
+
+  // ---------- s3: boolean mask ----------
+  function applyMask(){
+    const op = document.getElementById('mask-op').value;
+    const val = parseFloat(document.getElementById('mask-val').value);
+    renderArr('mask-arr', tempData, cityLabels, days);
+    let count = 0;
+    tempData.forEach((row, ri) => row.forEach((v, ci) => {
+      const match = op === '>' ? v > val : op === '<' ? v < val : v >= val;
+      if (match){
+        count++;
+        document.querySelectorAll(`#mask-arr [data-row="${ri}"][data-col="${ci}"]`).forEach(el => el.classList.add('anatomy-highlight'));
+      }
+    }));
+    const opSym = op === '>' ? '>' : op === '<' ? '<' : '>=';
+    document.getElementById('mask-code').innerText = `temps[temps ${opSym} ${val}]`;
+    document.getElementById('mask-stats').innerHTML =
+      `<div class="prop-chip">Total readings: <b>35</b></div>` +
+      `<div class="prop-chip">Matching: <b>${count}</b></div>` +
+      `<div class="prop-chip">Not matching: <b>${35 - count}</b></div>`;
+  }
+
+  // ---------- s4: elementwise ops ----------
+  function applyOp(){
+    const op = document.getElementById('op-select').value;
+    const val = parseFloat(document.getElementById('op-val').value);
+    let code, data;
+    if (op === 'add'){ code = `temps + ${val}`; data = tempData.map(r => r.map(v => v + val)); }
+    else if (op === 'sub'){ code = `temps - ${val}`; data = tempData.map(r => r.map(v => v - val)); }
+    else if (op === 'mul'){ code = `temps * ${val}`; data = tempData.map(r => r.map(v => v * val)); }
+    else if (op === 'div'){ code = `temps / ${val}`; data = tempData.map(r => r.map(v => val !== 0 ? v / val : NaN)); }
+    else { code = `temps > ${val}`; data = tempData.map(r => r.map(v => v > val ? 'True' : 'False')); }
+    document.getElementById('op-code').innerText = code;
+    renderArr('op-arr', data, cityLabels, days);
+  }
+
+  // ---------- s5: reshape playground ----------
+  function applyReshape(){
+    const rows = parseInt(document.getElementById('rs-rows').value) || 0;
+    const cols = parseInt(document.getElementById('rs-cols').value) || 0;
+    const flat = tempData.flat();
+    document.getElementById('rs-code').innerText = `flat.reshape(${rows}, ${cols})`;
+    if (rows * cols !== flat.length){
+      document.getElementById('rs-result').innerHTML =
+        `<p class="body-text" style="color:var(--red);">ValueError: cannot reshape array of size 35 into shape (${rows},${cols}) &mdash; ${rows} &times; ${cols} = ${rows*cols}, not 35.</p>`;
+      return;
+    }
+    const data = [];
+    for (let r = 0; r < rows; r++) data.push(flat.slice(r * cols, r * cols + cols));
+    renderArr('rs-result', data);
+  }
+
+  // ---------- s6: aggregation playground ----------
+  function aggFn(vals, fn){
+    const n = vals.length;
+    if (fn === 'sum') return vals.reduce((a,b) => a+b, 0);
+    if (fn === 'mean') return vals.reduce((a,b) => a+b, 0) / n;
+    if (fn === 'max') return Math.max(...vals);
+    if (fn === 'min') return Math.min(...vals);
+    const mean = vals.reduce((a,b) => a+b, 0) / n;
+    return Math.sqrt(vals.reduce((a,b) => a + (b-mean)**2, 0) / n);
+  }
+  function applyAgg(){
+    const fn = document.getElementById('agg-fn').value;
+    const axis = document.getElementById('agg-axis').value;
+    document.getElementById('agg-code').innerText = axis === 'none' ? `temps.${fn}()` : `temps.${fn}(axis=${axis})`;
+    if (axis === 'none'){
+      renderText('agg-result', `${+aggFn(tempData.flat(), fn).toFixed(2)}`);
+    } else if (axis === '1'){
+      const rows = tempData.map(row => [+aggFn(row, fn).toFixed(2)]);
+      renderArr('agg-result', rows, cityLabels, [fn + '()']);
+    } else {
+      const perDay = days.map((_, ci) => +aggFn(tempData.map(r => r[ci]), fn).toFixed(2));
+      renderArr('agg-result', [perDay], [fn + '()'], days);
+    }
+  }
+
+  // ---------- s7: dot product playground ----------
+  function applyDot(){
+    const a = document.getElementById('dot-a').value.split(',').map(s => parseFloat(s.trim())).filter(v => !isNaN(v));
+    const b = document.getElementById('dot-b').value.split(',').map(s => parseFloat(s.trim())).filter(v => !isNaN(v));
+    const out = document.getElementById('dot-out');
+    if (a.length !== b.length || a.length === 0){
+      out.innerHTML = '<span style="color:var(--red);">Vectors must be the same length.</span>';
+      return;
+    }
+    const terms = a.map((v, i) => `${v}&times;${b[i]}`).join(' + ');
+    const result = a.reduce((sum, v, i) => sum + v * b[i], 0);
+    out.innerHTML = `<span class="mono">np.dot(a, b)</span> = ${terms} = <strong class="emph">${result}</strong>`;
+  }
+
+  // ---------- s7: seeded random ----------
+  function applyRandom(){
+    const seed = parseInt(document.getElementById('rand-seed').value) || 0;
+    document.getElementById('rand-code').innerText = `np.random.seed(${seed})\nnp.random.randint(0, 40, size=(5,))`;
+    const rand = mulberry32(seed);
+    const vals = Array.from({length: 5}, () => Math.floor(rand() * 40));
+    renderArr('rand-out', [vals]);
+  }
+
+  // ---------- workflow insights ----------
+  function renderWorkflowInsights(){
+    const cityAvg = tempData.map(row => row.reduce((a,b)=>a+b,0) / row.length);
+    const cityStd = tempData.map(row => {
+      const m = row.reduce((a,b)=>a+b,0) / row.length;
+      return Math.sqrt(row.reduce((a,b)=>a+(b-m)**2,0) / row.length);
+    });
+    const dayAvg = days.map((_, ci) => tempData.reduce((s, r) => s + r[ci], 0) / tempData.length);
+    const hottestIdx = cityAvg.indexOf(Math.max(...cityAvg));
+    const steadiestIdx = cityStd.indexOf(Math.min(...cityStd));
+    const coolestDayIdx = dayAvg.indexOf(Math.min(...dayAvg));
+    let heatwaveCount = 0;
+    const flat = tempData.flat();
+    flat.forEach(v => { if (v > 28) heatwaveCount++; });
+    const range = Math.max(...flat) - Math.min(...flat);
+
+    document.getElementById('qa-1').innerText = `${cities[hottestIdx]} — average ${cityAvg[hottestIdx].toFixed(1)}\u00b0C`;
+    document.getElementById('qa-2').innerText = `${cities[steadiestIdx]} — std of ${cityStd[steadiestIdx].toFixed(2)}\u00b0C`;
+    document.getElementById('qa-3').innerText = `${days[coolestDayIdx]} — average ${dayAvg[coolestDayIdx].toFixed(1)}\u00b0C across all cities`;
+    document.getElementById('qa-4').innerText = `${heatwaveCount} readings, all in Cairo — the only city that crosses 28\u00b0C this week`;
+    document.getElementById('qa-6').innerText = `${range}\u00b0C — from ${Math.min(...flat)}\u00b0C (Oslo) to ${Math.max(...flat)}\u00b0C (Cairo)`;
+
+    const order = cities.map((c, i) => [c, cityAvg[i]]).sort((a, b) => b[1] - a[1]);
+    const rows = order.map(([c, avg]) => [+avg.toFixed(2)]);
+    renderArr('qa-5-table', rows, order.map(([c]) => c), ['avg_temp']);
+  }
+
+  // per-question feedback
+  const quizFeedback = {
+    qs1: { correct: 'Correct — fixed dtype, shape-awareness, and vectorized math are exactly what NumPy adds on top of a plain list.', wrong: 'Not quite — a list already accepts any type. NumPy actually restricts every element to one shared dtype, which is what unlocks fast vectorized math.' },
+    qs2: { correct: 'Right — linspace always includes both endpoints and spaces the rest evenly between them.', wrong: 'Not quite — that\'s what np.random.uniform() would do. linspace is deterministic and evenly spaced, not random.' },
+    qs3: { correct: 'Right — a single index with no comma selects that whole row: every day, for Oslo.', wrong: 'Not quite — that\'s what temps[:, 2] would select. A bare row index selects a whole row, not a column.' },
+    qs4: { correct: 'Right — dimensions are compared from the right; 7 matches 1 by stretching, and the first dimensions (5 and 5) already match.', wrong: 'Not quite — broadcasting allows a dimension of 1 to stretch to match the other. (5,1) stretches to (5,7) just fine.' },
+    qs5: { correct: 'Right — -1 tells NumPy to compute that dimension automatically from the total element count.', wrong: 'Not quite — NumPy computes the missing dimension exactly (35 \u00f7 5 = 7), it never just guesses.' },
+    qs6: { correct: 'Not quite — that collapses the cities, giving one average per day, the opposite of what\'s needed.', wrong: 'Right — axis=1 collapses the 7 days, leaving one average per city.' },
+    qs7: { correct: 'Right — @ performs true matrix multiplication (rows-by-columns); * multiplies element by element.', wrong: 'Not quite — for 2-D arrays these give different results whenever the arrays aren\'t diagonal or 1x1.' },
+    p1: { correct: 'Right — index 1 is the second element: 20.', wrong: 'Not quite — index 1 is the second element (20), not the third.' },
+    p2: { correct: 'Right — NumPy needs one shared dtype, so any float in the list upcasts every element to float64.', wrong: 'Not quite — a single float value forces the whole array to float64, since NumPy arrays can\'t mix types.' },
+    p3: { correct: 'Right — like Python slicing, the stop index is excluded, so 2:6 gives indices 2, 3, 4, 5.', wrong: 'Not quite — the stop index is excluded, same as normal Python slicing. 2:6 gives 4 elements, not 5.' },
+    p4: { correct: 'Right — linspace(0, 1, 10) gives exactly 10 evenly spaced values including both 0 and 1.', wrong: 'Not quite — arange\'s third argument is a step size, not a count, so this wouldn\'t give 10 evenly spaced values between 0 and 1.' },
+    p5: { correct: 'Right — argmax() returns the index of the largest value; max() returns the value itself.', wrong: 'Not quite — max() returns the value. argmax() is the one that returns its position.' },
+    p6: { correct: 'Right — seeding the generator makes every subsequent "random" call deterministic and repeatable.', wrong: 'Not quite — without a seed, every run (or every cell re-run) produces different numbers.' },
+    p7: { correct: 'Right — NumPy arrays must be rectangular; a list of lists with mismatched lengths raises an error rather than becoming a ragged array.', wrong: 'Not quite — the inner lists have 2 and 3 elements, which NumPy won\'t silently accept as a regular 2-D array.' },
+    p8: { correct: 'Right — 3 \u00d7 4 = 12 elements are needed, but arange(10) only has 10. Reshape can\'t invent or drop elements.', wrong: 'Not quite — reshape works fine on any array; the real issue is that the target shape\'s element count doesn\'t match the original.' },
+    p9: { correct: 'Right — either shape lets b line up with one of a\'s dimensions so it can stretch across the other.', wrong: 'Not quite — broadcasting can absolutely combine differently-shaped arrays, as long as their dimensions align from the right.' },
+    p10: { correct: 'Right — comparison operators are vectorized, so arr > 20 produces a boolean mask directly.', wrong: 'Not quite — NumPy uses plain comparison operators (>, <, ==) for this, not method calls like .greater().' },
+    p11: { correct: 'Right — axis=1 collapses the columns of each row, leaving one sum per row.', wrong: 'Not quite — axis=0 would collapse the rows instead, giving one sum per column.' },
+    p12: { correct: 'Right — axis=0 is the dimension that disappears, so the 5 rows collapse, leaving shape (7,).', wrong: 'Not quite — axis=0 collapses the rows (5), not the columns. The result keeps the 7.' },
+    p13: { correct: 'Right — a basic slice is a view into the same memory, so changes to it show up in the original array too.', wrong: 'Not quite — unlike a Python list slice, a NumPy slice shares memory with the original array by default.' },
+    p14: { correct: 'Right — ~ inverts the boolean mask, so it keeps everything that was NOT greater than 20.', wrong: 'Not quite — arr > 20 already selects values above 20; ~ flips that to select everything else.' },
+    p15: { correct: 'Right — with matching leading dimensions, the (1,7) row broadcasts down across every one of the 5 rows.', wrong: 'Not quite — broadcasting allows a size-1 dimension to stretch to match; (1,7) and (5,7) are compatible.' },
+    p16: { correct: 'Right — hstack joins along axis 1 (columns), keeping the same 3 rows but doubling the columns to 8.', wrong: 'Not quite — that\'s what vstack would do. hstack joins side by side, along the columns.' },
+    p17: { correct: 'Right — casting float to int always truncates toward zero rather than rounding, which can look like data loss.', wrong: 'Not quite — astype(int) runs without error on floats; it just truncates the decimals rather than rounding them.' },
+    p18: { correct: 'Right — * multiplies corresponding elements; @ performs true matrix multiplication, summing over shared dimensions.', wrong: 'Not quite — for non-trivial matrices, * and @ produce different results, since they follow entirely different rules.' },
+    p19: { correct: 'Right — the average alone can hide how volatile a city\'s week actually was; std captures that spread.', wrong: 'Not quite — two cities can share the same mean while one swings wildly day to day and the other barely moves. std is what tells them apart.' },
+    p20: { correct: 'Right — -1 lets NumPy infer the row count, and 1 fixes a single column, producing an (n, 1) column vector.', wrong: 'Not quite — reshape(-1, 1) fixes the column count at 1 and infers the rows, producing a column vector, not a row.' },
+  };
+  function answerQuiz(btn, isCorrect, groupId){
+    const group = btn.closest('.quiz-opts');
+    group.querySelectorAll('.quiz-opt').forEach(b => b.disabled = true);
+    btn.classList.add(isCorrect ? 'correct' : 'wrong');
+    const fb = document.getElementById(groupId + '-feedback');
+    fb.classList.add('show');
+    const msg = quizFeedback[groupId];
+    fb.innerHTML = msg ? (isCorrect ? msg.correct : msg.wrong) : (isCorrect ? 'Correct!' : 'Not quite.');
+  }
+
+  // init
+  renderDatasetAndProps();
+  if (document.getElementById('create-out')) createArr('zeros', document.querySelector('#s2 .tab-btn'));
+  if (document.getElementById('idx-arr')) applyIndex();
+  if (document.getElementById('mask-arr')) applyMask();
+  if (document.getElementById('op-arr')) applyOp();
+  if (document.getElementById('rs-result')) applyReshape();
+  if (document.getElementById('agg-result')) applyAgg();
+  if (document.getElementById('dot-out')) applyDot();
+  if (document.getElementById('rand-out')) applyRandom();
+  if (document.getElementById('qa-1')) renderWorkflowInsights();
+</script>
+
+</body>
+</html>
