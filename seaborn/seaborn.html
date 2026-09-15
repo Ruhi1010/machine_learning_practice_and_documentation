@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seaborn: The Complete Note | Ruhi Practice Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0b1020; --bg-alt: #11182d; --card: #151d36; --cell-bg: #10172b; --cell-border: #26345a; --border: #202b4a;
+    --text: #eef2ff; --text-dim: #a9b5d6; --text-faint: #6f7da3;
+    --accent: #8b5cf6; --accent-soft: rgba(139,92,246,.14);
+    --teal: #22d3ee; --teal-soft: rgba(34,211,238,.10);
+    --purple: #c084fc; --purple-soft: rgba(192,132,252,.10);
+    --red: #fb7185; --red-soft: rgba(251,113,133,.10);
+    --shadow: rgba(2,6,23,.65);
+  }
+  html[data-theme="light"]{
+    --bg: #f6f7ff; --bg-alt: #edf0ff; --card: #ffffff; --cell-bg: #f3f5ff; --cell-border: #d9def2; --border: #e1e5f5;
+    --text: #171b35; --text-dim: #59627f; --text-faint: #7b84a2;
+    --accent: #6d28d9; --accent-soft: rgba(109,40,217,.09);
+    --teal: #0891b2; --teal-soft: rgba(8,145,178,.08);
+    --purple: #9333ea; --purple-soft: rgba(147,51,234,.08);
+    --red: #e11d48; --red-soft: rgba(225,29,72,.08);
+    --shadow: rgba(50,60,100,.14);
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    background: var(--bg); color: var(--text);
+    font-family:'Manrope', sans-serif; line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    transition: background-color .35s ease, color .35s ease;
+  }
+  .mono{ font-family:'JetBrains Mono', monospace; }
+  ::selection{ background: var(--accent-soft); color: var(--accent); }
+
+  #progress-bar{
+    position: fixed; top:0; left:0; height:3px; width:0%;
+    background: linear-gradient(90deg, var(--accent), var(--teal));
+    z-index: 200; transition: width .1s ease-out;
+  }
+  #theme-toggle{
+    position: fixed; top: 18px; right: 20px; z-index: 150;
+    width: 42px; height: 42px; border-radius: 50%;
+    background: var(--card); border: 1px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; box-shadow: 0 8px 20px var(--shadow);
+    transition: transform .2s ease, border-color .2s ease;
+  }
+  #theme-toggle:hover{ border-color: var(--accent); transform: scale(1.06); }
+  #theme-toggle svg{ width:19px; height:19px; }
+  #back-to-top{
+    position: fixed; bottom: 24px; right: 20px; z-index: 150;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--accent); border:none; color:#14161b;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; box-shadow: 0 8px 20px var(--shadow);
+    opacity:0; pointer-events:none; transition: opacity .25s ease, transform .2s ease;
+  }
+  #back-to-top.show{ opacity:1; pointer-events:auto; }
+  #back-to-top:hover{ transform: translateY(-3px); }
+
+  .wrap{ max-width: 900px; margin:0 auto; padding: 0 24px; }
+  section{ padding: 100px 0; }
+
+  #hero{ padding-top: 130px; text-align:center; }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace; font-size:13px; letter-spacing:.14em;
+    text-transform:uppercase; color: var(--accent); margin-bottom:20px;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+  }
+  .eyebrow::before, .eyebrow::after{ content:""; width:26px; height:1px; background: var(--accent); opacity:.5; }
+  h1.hero-title{ font-size: clamp(36px, 6vw, 56px); font-weight:800; letter-spacing:-.02em; line-height:1.1; margin-bottom:22px; }
+  .hero-title .hl{ color: var(--accent); }
+  .hero-sub{ font-size:18px; color: var(--text-dim); max-width:600px; margin:0 auto 40px; }
+  .hero-stats{ display:flex; justify-content:center; gap: 36px; flex-wrap:wrap; }
+  .hero-stat .num{ font-family:'JetBrains Mono', monospace; font-size:24px; font-weight:700; color:var(--teal); }
+  .hero-stat .lbl{ font-size:12.5px; color: var(--text-faint); text-transform:uppercase; letter-spacing:.06em; }
+
+  #toc .hero-sub{ margin-bottom: 46px; }
+  .toc-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:14px; }
+  .toc-card{
+    background: var(--card); border:1px solid var(--border); border-radius:14px;
+    padding: 20px 20px 18px; text-decoration:none; color:var(--text);
+    display:flex; flex-direction:column; gap:8px;
+    transition: border-color .2s ease, transform .2s ease; position: relative;
+  }
+  .toc-card.ready:hover{ border-color: var(--accent); transform: translateY(-3px); }
+  .toc-card.locked{ opacity:.5; }
+  .toc-num{ font-family:'JetBrains Mono', monospace; font-size:12px; color: var(--text-faint); }
+  .toc-title{ font-size:14.5px; font-weight:700; }
+  .toc-desc{ font-size:12.5px; color: var(--text-dim); }
+  .toc-pill{ position:absolute; top:16px; right:16px; font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.04em; padding:3px 9px; border-radius:999px; text-transform:uppercase; }
+  .toc-pill.ready{ background: var(--teal-soft); color: var(--teal); }
+  .toc-pill.soon{ background: var(--border); color: var(--text-faint); }
+
+  .chapter{ border-top:1px solid var(--border); scroll-margin-top: 30px; }
+  .ch-meta{ display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+  .ch-eyebrow{ font-family:'JetBrains Mono', monospace; font-size:12px; letter-spacing:.1em; text-transform:uppercase; color: var(--accent); }
+  .ch-badge{ font-family:'JetBrains Mono', monospace; font-size:11px; color: var(--text-faint); border:1px solid var(--border); padding:3px 10px; border-radius:999px; }
+  h2.ch-title{ font-size: clamp(28px, 4vw, 38px); font-weight:800; letter-spacing:-.01em; margin-bottom:18px; }
+  .step-label{ font-family:'JetBrains Mono', monospace; font-size:11.5px; letter-spacing:.08em; text-transform:uppercase; color: var(--text-faint); margin: 40px 0 12px; display:flex; align-items:center; gap:10px; }
+  .step-label::before{ content:""; width:14px; height:1px; background: var(--text-faint); }
+  p.body-text{ color: var(--text-dim); font-size:16px; max-width: 660px; margin-bottom:16px; }
+  strong.emph{ color: var(--text); }
+
+  .info-card{ border-radius:12px; padding:20px 22px; margin: 18px 0; border-left:3px solid; font-size:14.5px; }
+  .info-card .info-label{ font-family:'JetBrains Mono', monospace; font-size:11.5px; letter-spacing:.06em; text-transform:uppercase; margin-bottom:8px; display:block; font-weight:700; }
+  .info-card p{ color: var(--text-dim); }
+  .info-card.remember{ background: var(--teal-soft); border-color: var(--teal); }
+  .info-card.remember .info-label{ color: var(--teal); }
+  .info-card.mistake{ background: var(--red-soft); border-color: var(--red); }
+  .info-card.mistake .info-label{ color: var(--red); }
+  .info-card.insight{ background: var(--accent-soft); border-color: var(--accent); }
+  .info-card.insight .info-label{ color: var(--accent); }
+  .info-card.tip{ background: var(--purple-soft); border-color: var(--purple); }
+  .info-card.tip .info-label{ color: var(--purple); }
+  .info-card.usecase{ background: var(--teal-soft); border-color: var(--teal); }
+  .info-card.usecase .info-label{ color: var(--teal); }
+
+  .code-block{ background: var(--cell-bg); border:1px solid var(--cell-border); border-radius:12px; overflow:hidden; margin: 18px 0; }
+  .code-head{ display:flex; align-items:center; justify-content:space-between; padding:10px 16px; background: var(--bg-alt); border-bottom:1px solid var(--cell-border); }
+  .code-head .left{ display:flex; align-items:center; gap:10px; }
+  .code-dots{ display:flex; gap:6px; }
+  .code-dots span{ width:8px; height:8px; border-radius:50%; background: var(--border); }
+  .code-lang{ font-family:'JetBrains Mono', monospace; font-size:11px; color: var(--text-faint); }
+  .code-actions{ display:flex; gap:8px; }
+  .code-btn{ font-family:'JetBrains Mono', monospace; font-size:11px; color: var(--text-dim); background:transparent; border:1px solid var(--border); border-radius:7px; padding:5px 11px; cursor:pointer; transition: all .15s ease; }
+  .code-btn:hover{ border-color: var(--accent); color: var(--accent); }
+  .code-btn.run-btn{ color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+  pre.code-body{ padding:18px 20px; font-family:'JetBrains Mono', monospace; font-size:13.5px; overflow-x:auto; white-space:pre; }
+  .kw{ color: var(--purple); } .str{ color: var(--teal); } .fn{ color:#7fb4ff; } .cmt{ color: var(--text-faint); }
+  html[data-theme="light"] .fn{ color:#2563b0; }
+  .code-output{ display:none; border-top:1px solid var(--cell-border); }
+  .code-output.show{ display:block; animation: fadeIn .3s ease; }
+  .code-output .out-label{ padding:8px 20px 0; font-family:'JetBrains Mono', monospace; font-size:10.5px; color: var(--text-faint); text-transform:uppercase; letter-spacing:.06em; }
+  .code-output pre{ padding:8px 20px 16px; font-family:'JetBrains Mono', monospace; font-size:13.5px; color: var(--text-dim); white-space:pre; }
+  @keyframes fadeIn{ from{opacity:0;} to{opacity:1;} }
+
+  /* ---------- Jupyter-style DataFrame table ---------- */
+  .df-wrap{ overflow-x:auto; border-radius:12px; border:1px solid var(--cell-border); margin: 16px 0; }
+  .df-table{ border-collapse:collapse; width:100%; font-family:'JetBrains Mono', monospace; font-size:12.5px; }
+  .df-table thead th{ background: var(--bg-alt); color: var(--text-dim); padding:10px 16px; border-bottom:2px solid var(--cell-border); font-weight:600; white-space:nowrap; }
+  .df-table th.df-index-h{ background: var(--bg-alt); }
+  .df-table td{ padding:9px 16px; border-bottom:1px solid var(--cell-border); color: var(--text); white-space:nowrap; }
+  .df-table td.df-index{ color: var(--text-faint); font-weight:600; background: var(--bg-alt); }
+  .df-table tbody tr:hover td{ background: var(--accent-soft); }
+  .df-table td.df-nan{ color: var(--red); font-style:italic; }
+  .df-table .anatomy-highlight{ background: var(--accent-soft) !important; outline:2px solid var(--accent); outline-offset:-2px; }
+  .df-caption{ font-size:12px; color: var(--text-faint); margin-top:-8px; margin-bottom:16px; }
+
+  .task-list{ list-style:none; padding:0; margin:14px 0; }
+  .task-list li{ padding:9px 0 9px 26px; position:relative; color: var(--text-dim); font-size:14px; border-bottom:1px solid var(--border); }
+  .task-list li:last-child{ border-bottom:none; }
+  .task-list li::before{ content:"\2192"; position:absolute; left:0; color: var(--accent); font-family:'JetBrains Mono', monospace; }
+
+  /* ---------- tabs / toggle buttons ---------- */
+  .tabs{ display:flex; gap:8px; margin: 16px 0; flex-wrap:wrap; }
+  .tab-btn{ font-family:'JetBrains Mono', monospace; font-size:12.5px; background:transparent; border:1px solid var(--border); color:var(--text-dim); padding:8px 16px; border-radius:999px; cursor:pointer; transition: all .15s ease; }
+  .tab-btn:hover{ border-color: var(--accent); color: var(--text); }
+  .tab-btn.active{ background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+  /* ---------- playground ---------- */
+  .playground{ background: var(--card); border:1px solid var(--border); border-radius:16px; padding:26px 26px 24px; margin: 22px 0; }
+  .pg-controls{ display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; margin-bottom:6px; }
+  .pg-field{ display:flex; flex-direction:column; }
+  .pg-field label{ font-family:'JetBrains Mono', monospace; font-size:10.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:7px; }
+  .pg-field select, .pg-field input{ background: var(--bg-alt); border:1px solid var(--border); color: var(--text); padding:9px 12px; border-radius:8px; font-family:'JetBrains Mono', monospace; font-size:13px; width:150px; }
+
+  /* ---------- comparison table ---------- */
+  .dim-table{ width:100%; border-collapse:collapse; margin:20px 0; font-size:13.5px; }
+  .dim-table th, .dim-table td{ text-align:left; padding:10px 14px; border-bottom:1px solid var(--border); }
+  .dim-table th{ color: var(--text-faint); font-family:'JetBrains Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:.05em; font-weight:600; }
+  .dim-table td.dim-name{ color: var(--teal); font-family:'JetBrains Mono', monospace; font-weight:600; }
+
+  /* ---------- architecture diagram ---------- */
+  .diagram-shell{ background: var(--card); border:1px solid var(--border); border-radius: 20px; padding: 44px 30px; margin: 24px 0; overflow:hidden; }
+  .eco-svg{ width:100%; height:auto; display:block; }
+  .eco-node rect{ fill: var(--cell-bg); stroke: var(--cell-border); stroke-width:1.5; transition: stroke .3s ease; }
+  .eco-node text{ fill: var(--text); font-family:'JetBrains Mono', monospace; }
+  .eco-node.visible rect{ stroke: var(--accent); }
+  .eco-node{ opacity:0; transform: translateY(14px); transition: opacity .6s ease, transform .6s ease; }
+  .eco-node.visible{ opacity:1; transform: translateY(0); }
+  .eco-path.flow{ stroke: var(--accent); stroke-width:2; fill:none; stroke-dasharray: 300; stroke-dashoffset: 300; transition: stroke-dashoffset 1.2s ease; }
+  .eco-path.flow.visible{ stroke-dashoffset: 0; }
+
+  /* ---------- quiz ---------- */
+  .quiz-block{ background: var(--card); border:1px solid var(--border); border-radius:14px; padding:26px 26px 24px; margin: 30px 0; }
+  .quiz-q{ font-weight:700; font-size:15.5px; margin-bottom:16px; }
+  .quiz-opts{ display:flex; flex-direction:column; gap:9px; }
+  .quiz-opt{ text-align:left; background: var(--bg-alt); border:1px solid var(--border); color: var(--text); padding:12px 16px; border-radius:9px; font-size:14px; cursor:pointer; font-family:'Manrope', sans-serif; transition: all .15s ease; }
+  .quiz-opt:hover{ border-color: var(--accent); }
+  .quiz-opt.correct{ border-color: var(--teal); background: var(--teal-soft); color: var(--teal); }
+  .quiz-opt.wrong{ border-color: var(--red); background: var(--red-soft); color: var(--red); }
+  .quiz-feedback{ margin-top:14px; font-size:13.5px; color: var(--text-dim); display:none; }
+  .quiz-feedback.show{ display:block; animation: fadeIn .3s ease; }
+
+  .prop-grid{ display:flex; flex-wrap:wrap; gap:10px; margin: 16px 0; }
+  .prop-chip{ font-family:'JetBrains Mono', monospace; font-size:12.5px; background: var(--cell-bg); border:1px solid var(--cell-border); border-radius:9px; padding:9px 14px; color: var(--text-dim); }
+  .prop-chip b{ color: var(--teal); }
+
+  @keyframes rowEnter{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
+
+  /* ---------- split-apply-combine visual (section 7) ---------- */
+  .sac-flow{ display:flex; align-items:center; gap:20px; flex-wrap:wrap; margin:20px 0; padding:24px; background: var(--card); border:1px solid var(--border); border-radius:14px; }
+  .sac-stage{ text-align:center; flex:1; min-width:110px; }
+  .sac-icon{ font-size:26px; margin-bottom:8px; }
+  .sac-label{ font-family:'JetBrains Mono', monospace; font-size:13px; font-weight:700; color: var(--text); }
+  .sac-sub{ font-size:11.5px; color: var(--text-faint); margin-top:2px; }
+  .sac-arrow{ font-size:20px; color: var(--text-faint); }
+  .sac-stage.pulse{ animation: sacPulse .5s ease; }
+  @keyframes sacPulse{ 0%{ transform:scale(1); } 50%{ transform:scale(1.05); box-shadow:0 0 0 4px var(--accent-soft); border-radius:12px; } 100%{ transform:scale(1); } }
+
+  .quiz-tag{ font-family:'JetBrains Mono', monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color: var(--accent); background: var(--accent-soft); padding:3px 10px; border-radius:999px; display:inline-block; margin-bottom:10px; }
+  .quiz-code{ background: var(--bg-alt); border:1px solid var(--border); border-radius:8px; padding:12px 14px; font-family:'JetBrains Mono', monospace; font-size:13px; margin:10px 0 16px; white-space:pre; overflow-x:auto; color: var(--text-dim); }
+
+  .insight-qa{ display:flex; flex-direction:column; gap:12px; margin:20px 0; }
+  .qa-item{ background: var(--card); border:1px solid var(--border); border-radius:12px; padding:16px 20px; }
+  .qa-q{ font-size:14px; color: var(--text-dim); margin-bottom:8px; }
+  .qa-a{ font-family:'JetBrains Mono', monospace; font-size:14.5px; color: var(--teal); font-weight:600; }
+
+  .roadmap-flow{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:26px 0; }
+  .roadmap-step{ font-family:'JetBrains Mono', monospace; font-size:12px; background: var(--card); border:1px solid var(--border); padding:8px 14px; border-radius:999px; color: var(--text-dim); }
+  .roadmap-arrow{ color: var(--text-faint); font-size:13px; }
+  .roadmap-step.final{ background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight:700; }
+  .pull-quote{ font-size: clamp(20px, 3vw, 26px); font-weight:700; line-height:1.4; color: var(--text); border-left:3px solid var(--accent); padding-left:22px; margin: 30px 0; }
+
+  footer{ text-align:center; padding: 50px 24px 70px; color: var(--text-faint); font-family:'JetBrains Mono', monospace; font-size:12px; border-top:1px solid var(--border); }
+
+  @media (max-width: 760px){
+    .toc-grid{ grid-template-columns: 1fr; }
+    section{ padding: 64px 0; }
+    #hero{ padding-top: 100px; }
+  }
+
+  /* ---------- chart canvas ---------- */
+  .chart-shell{ background: var(--card); border:1px solid var(--border); border-radius:16px; padding:20px 22px 16px; margin: 18px 0; }
+  .chart-svg{ width:100%; height:auto; display:block; }
+  .chart-axis{ stroke: var(--text-faint); stroke-width:1.5; }
+  .chart-grid{ stroke: var(--border); stroke-width:1; }
+  .chart-tick{ fill: var(--text-faint); font-family:'JetBrains Mono', monospace; font-size:10.5px; }
+  .chart-title{ fill: var(--text); font-family:'Manrope', sans-serif; font-size:14px; font-weight:700; }
+  .chart-label{ fill: var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:11px; }
+  .legend-row{ display:flex; flex-wrap:wrap; gap:14px; margin-top:10px; padding-top:10px; border-top:1px solid var(--border); }
+  .legend-item{ display:flex; align-items:center; gap:7px; font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-dim); }
+  .legend-swatch{ width:14px; height:3px; border-radius:2px; display:inline-block; }
+  .legend-dot{ width:9px; height:9px; border-radius:50%; display:inline-block; }
+  .anatomy-part{ cursor:pointer; transition: opacity .2s ease; }
+  .anatomy-part.dim{ opacity:.28; }
+  .anatomy-part.hl rect, .anatomy-part.hl path, .anatomy-part.hl line{ stroke: var(--accent) !important; stroke-width:2.5 !important; }
+  .anatomy-part.hl text{ fill: var(--accent) !important; }
+  .pg-field select[multiple]{ height:auto; }
+  .color-swatch-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .color-swatch{ width:26px; height:26px; border-radius:8px; cursor:pointer; border:2px solid transparent; }
+  .color-swatch.active{ border-color: var(--text); }
+
+  /* ---------- seaborn extras ---------- */
+  .heat-cell{ transition: opacity .3s ease; }
+  .palette-row{ display:flex; gap:0; border-radius:8px; overflow:hidden; margin-top:6px; }
+  .palette-row span{ flex:1; height:22px; }
+  .palette-pick{ cursor:pointer; border:2px solid transparent; border-radius:10px; padding:5px 7px; }
+  .palette-pick.active{ border-color: var(--accent); }
+  .palette-pick .pname{ font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); }
+  .fmt-table{ width:100%; border-collapse:collapse; margin:14px 0; font-family:'JetBrains Mono', monospace; font-size:12.5px; }
+  .fmt-table th{ background: var(--card-2); color: var(--text-dim); padding:9px 12px; text-align:left; border:1px solid var(--border); font-weight:600; }
+  .fmt-table td{ padding:8px 12px; border:1px solid var(--border); color: var(--text-dim); }
+  .fmt-table tr:hover td{ background: var(--card-2); }
+  .vs-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:18px 0; }
+  @media (max-width:760px){ .vs-grid{ grid-template-columns:1fr; } }
+  .vs-col h4{ font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.08em; margin:0 0 8px; }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+  <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></svg>
+</button>
+<button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+<section id="hero">
+  <div class="wrap">
+    <div class="eyebrow">✦ Ruhi Practice Hub ✦</div>
+    <h1 class="hero-title">Seaborn — statistics,<br>drawn in <span class="hl">one line</span></h1>
+    <p class="hero-sub">Fourth in the series, after NumPy, Pandas and Matplotlib. Same running dataset — a week of temperatures across five cities — but now reshaped into tidy form and handed to a library that does the statistics for you.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">7</div><div class="lbl">Core Sections</div></div>
+      <div class="hero-stat"><div class="num">1</div><div class="lbl">Dataset, Start to Finish</div></div>
+      <div class="hero-stat"><div class="num">20+</div><div class="lbl">Practice Questions</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="toc">
+  <div class="wrap">
+    <h2 class="ch-title" style="text-align:center;">7 sections, one tidy DataFrame</h2>
+    <div class="toc-grid">
+      <a href="#s1" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">01</span><span class="toc-title">Why Do We Need Seaborn?</span><span class="toc-desc">What it adds on top of Matplotlib, and what it doesn't replace.</span></a>
+      <a href="#s2" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">02</span><span class="toc-title">Tidy Data — Long vs Wide</span><span class="toc-desc">The reshape that makes every other section work.</span></a>
+      <a href="#s3" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">03</span><span class="toc-title">Relational Plots</span><span class="toc-desc">lineplot, scatterplot, and the hue parameter.</span></a>
+      <a href="#s4" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">04</span><span class="toc-title">Distribution Plots</span><span class="toc-desc">histplot, kdeplot, and what a density curve means.</span></a>
+      <a href="#s5" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">05</span><span class="toc-title">Categorical Plots</span><span class="toc-desc">boxplot, violinplot, barplot &amp; error bars.</span></a>
+      <a href="#s6" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">06</span><span class="toc-title">Themes &amp; Palettes</span><span class="toc-desc">set_theme, palettes, and choosing color honestly.</span></a>
+      <a href="#s7" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">07</span><span class="toc-title">Heatmaps &amp; Figure-Level Grids</span><span class="toc-desc">heatmap, relplot, catplot, and axes- vs figure-level.</span></a>
+      <a href="#workflow" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">＋</span><span class="toc-title">Real-World Workflow</span><span class="toc-desc">The full case study, start to finish.</span></a>
+      <a href="#practice" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">＋</span><span class="toc-title">Practice Questions</span><span class="toc-desc">20+ questions with instant feedback.</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" id="s1">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Section 01</span><span class="ch-badge">Foundations</span></div>
+    <h2 class="ch-title">Why Do We Need Seaborn?</h2>
+
+    <div class="step-label">The problem</div>
+    <p class="body-text">Matplotlib draws anything you ask it to — but it asks you to do all the statistics first. Say you want average temperature per city, with error bars showing the spread. In pure Matplotlib:</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">the_matplotlib_way.py</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button></div></div>
+      <pre class="code-body">means = temps.mean(axis=<span class="str">1</span>)
+errors = temps.std(axis=<span class="str">1</span>)
+fig, ax = plt.subplots()
+ax.bar(cities, means, yerr=errors, capsize=<span class="str">4</span>)
+ax.set_ylabel(<span class="str">"Temperature (\u00b0C)"</span>)
+ax.set_title(<span class="str">"Average Temperature by City"</span>)</pre>
+    </div>
+    <p class="body-text">Now the same chart in Seaborn:</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">the_seaborn_way.py</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button></div></div>
+      <pre class="code-body">sns.barplot(data=df, x=<span class="str">"city"</span>, y=<span class="str">"temp"</span>)</pre>
+    </div>
+    <p class="body-text">One line. Seaborn computed the mean per city, computed the uncertainty, drew the error bars, colored the categories, and labeled both axes from the column names — all from a tidy DataFrame.</p>
+    <ul class="task-list" style="margin-bottom:20px;">
+      <li>Aggregation is automatic — you pass raw rows, Seaborn computes the summary.</li>
+      <li>Axis labels and legends come from your DataFrame's column names.</li>
+      <li>Splitting by a category is one keyword (<span class="mono">hue=</span>), not a loop.</li>
+      <li>Statistical chart types (KDE, violin, box, regression) are built in, not hand-rolled.</li>
+      <li>Defaults are designed to look reasonable without tuning.</li>
+    </ul>
+
+    <div class="info-card insight">
+      <span class="info-label">Data Science Insight</span>
+      <p>Seaborn does not replace Matplotlib — it sits on top of it. Every Seaborn chart <em>is</em> a Matplotlib figure underneath, which is why you can still call <span class="mono">plt.title()</span>, <span class="mono">ax.set_ylim()</span>, or <span class="mono">plt.savefig()</span> on the result.</p>
+    </div>
+
+    <div class="step-label">Where Seaborn sits</div>
+    <div class="diagram-shell">
+      <svg class="eco-svg" viewBox="0 0 780 260" xmlns="http://www.w3.org/2000/svg">
+        <path class="eco-path flow" d="M 140 55 L 140 105" />
+        <path class="eco-path flow" d="M 140 105 L 390 105 L 390 155" />
+        <path class="eco-path flow" d="M 640 105 L 390 105" />
+        <path class="eco-path flow" d="M 390 205 L 390 155" />
+        <g class="eco-node" data-n="1"><rect x="70" y="18" width="140" height="40" rx="10"/><text x="140" y="43" font-size="13.5" text-anchor="middle" font-weight="600">NumPy</text></g>
+        <g class="eco-node" data-n="2"><rect x="70" y="68" width="140" height="40" rx="10"/><text x="140" y="93" font-size="13.5" text-anchor="middle" font-weight="600">Pandas DataFrame</text></g>
+        <g class="eco-node" data-n="3"><rect x="320" y="118" width="140" height="40" rx="10"/><text x="390" y="143" font-size="13.5" text-anchor="middle" font-weight="600">Seaborn</text></g>
+        <g class="eco-node" data-n="4"><rect x="570" y="68" width="140" height="40" rx="10"/><text x="640" y="93" font-size="12.5" text-anchor="middle" font-weight="600">Matplotlib</text></g>
+        <g class="eco-node" data-n="5"><rect x="320" y="205" width="140" height="40" rx="10"/><text x="390" y="230" font-size="12.5" text-anchor="middle" font-weight="600">Statistical Figures</text></g>
+      </svg>
+    </div>
+    <p class="body-text">Seaborn reads a Pandas DataFrame and issues Matplotlib drawing calls on your behalf. Both layers stay available to you at all times.</p>
+
+    <div class="step-label">The default theme difference</div>
+    <p class="body-text">Even before any statistics, calling <span class="mono">sns.set_theme()</span> changes how every subsequent Matplotlib chart looks:</p>
+    <div class="vs-grid">
+      <div class="vs-col">
+        <h4>Matplotlib defaults</h4>
+        <div class="chart-shell"><svg class="chart-svg" viewBox="0 0 320 210" xmlns="http://www.w3.org/2000/svg" id="plain-chart-svg"></svg></div>
+      </div>
+      <div class="vs-col">
+        <h4>After sns.set_theme()</h4>
+        <div class="chart-shell"><svg class="chart-svg" viewBox="0 0 320 210" xmlns="http://www.w3.org/2000/svg" id="themed-chart-svg"></svg></div>
+      </div>
+    </div>
+
+    <div class="step-label">Installing &amp; importing</div>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">terminal</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button></div></div>
+      <pre class="code-body">pip install seaborn</pre>
+    </div>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body"><span class="kw">import</span> seaborn <span class="kw">as</span> sns
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+sns.set_theme()   <span class="cmt"># applies Seaborn's default styling globally</span></pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>(no output — sns is ready, and the plotting style is now set)</pre></div>
+    </div>
+    <p class="body-text"><span class="mono">sns</span> is the universal convention. You import Matplotlib alongside it, since you'll still reach for <span class="mono">plt</span> to finalize figures.</p>
+
+    <div class="info-card mistake">
+      <span class="info-label">Common Mistake</span>
+      <p>Assuming Seaborn replaces Matplotlib entirely, then getting stuck the first time you need something Seaborn doesn't expose — a custom y-limit, a specific figure size, a saved file. The answer is always the Matplotlib layer underneath, not a missing Seaborn feature.</p>
+    </div>
+
+    <div class="step-label">Practice challenge</div>
+    <div class="quiz-block">
+      <div class="quiz-q">Quick check: what's the main thing Seaborn adds on top of Matplotlib?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'qs1')">A faster rendering engine for large figures</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'qs1')">Automatic statistical aggregation and DataFrame-aware defaults</button>
+      </div>
+      <div class="quiz-feedback" id="qs1-feedback"></div>
+    </div>
+
+    <div class="step-label">Summary</div>
+    <p class="body-text">You now know what Seaborn is for and how it relates to Matplotlib. Next: the data shape it expects — the single thing that trips up most beginners.</p>
+  </div>
+</section>
+
+<section class="chapter" id="s2">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Section 02</span><span class="ch-badge">Interactive reshape</span></div>
+    <h2 class="ch-title">Tidy Data — Long vs Wide</h2>
+
+    <div class="step-label">Why this section exists</div>
+    <p class="body-text">Seaborn's whole API is built on one assumption: <strong class="emph">one row per observation, one column per variable</strong>. Get the shape right and every chart is a one-liner. Get it wrong and nothing works, for reasons the error message rarely explains.</p>
+
+    <div class="step-label">The dataset, in wide form</div>
+    <p class="body-text">This is how the temperature data has looked so far — cities down the side, days across the top. Natural to read, wrong shape for Seaborn.</p>
+    <div id="wide-table"></div>
+    <p class="df-caption">Wide format: 5 rows &times; 7 columns. The day variable is spread across column <em>names</em>, not stored as data.</p>
+
+    <div class="step-label">The same data, in long form</div>
+    <p class="body-text">Melting it gives one row per reading — 35 rows, three columns. Every variable now lives in a column where Seaborn can address it by name.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body"><span class="cmt"># wide -> long</span>
+wide = pd.DataFrame(temps, index=cities, columns=days)
+df = wide.reset_index().melt(
+    id_vars=<span class="str">"index"</span>,
+    var_name=<span class="str">"day"</span>,
+    value_name=<span class="str">"temp"</span>
+).rename(columns={<span class="str">"index"</span>: <span class="str">"city"</span>})
+<span class="kw">print</span>(df.shape)
+<span class="kw">print</span>(df.head())</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>(35, 3)
+      city  day  temp
+0    Tokyo  Mon    18
+1    Cairo  Mon    29
+2     Oslo  Mon     4
+3     Lima  Mon    17
+4  Nairobi  Mon    24</pre></div>
+    </div>
+
+    <div class="step-label">Watch the reshape — interactive</div>
+    <p class="body-text">Toggle between the two shapes. Same 35 numbers, two entirely different layouts.</p>
+    <div class="playground">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="showShape('wide', this)">Wide (5 &times; 7)</button>
+        <button class="tab-btn" onclick="showShape('long', this)">Long / tidy (35 &times; 3)</button>
+      </div>
+      <div id="shape-table"></div>
+      <p class="body-text" id="shape-desc" style="margin-top:12px; margin-bottom:0;"></p>
+    </div>
+
+    <div class="step-label">Which columns map to what</div>
+    <p class="body-text">Once the data is long, every Seaborn call is just naming columns.</p>
+    <table class="fmt-table">
+      <tr><th>Seaborn parameter</th><th>Column from our df</th><th>What it controls</th></tr>
+      <tr><td>x=</td><td>"day"</td><td>Horizontal position</td></tr>
+      <tr><td>y=</td><td>"temp"</td><td>Vertical position</td></tr>
+      <tr><td>hue=</td><td>"city"</td><td>Color — splits into one series per value</td></tr>
+      <tr><td>col= / row=</td><td>"city"</td><td>Splits into separate subplots (figure-level only)</td></tr>
+      <tr><td>size= / style=</td><td>any column</td><td>Marker size or line style per group</td></tr>
+    </table>
+
+    <div class="info-card tip">
+      <span class="info-label">Pro Tip</span>
+      <p>If you're ever unsure whether your data is tidy, ask: "is one of my variables stored in the column headers instead of in a column?" If yes, it needs melting. In the wide table above, the day of the week is exactly that.</p>
+    </div>
+
+    <div class="info-card mistake">
+      <span class="info-label">Common Mistake</span>
+      <p>Passing wide data and then trying to use <span class="mono">hue="city"</span>. There is no column called <span class="mono">city</span> in wide form — the cities are the index — so Seaborn raises a key error. Melt first, then plot.</p>
+    </div>
+
+    <div class="step-label">Practice challenge</div>
+    <div class="quiz-block">
+      <div class="quiz-q">Our wide table is 5&times;7. After melting to long form, what's the shape?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'qs2')">(35, 3) — one row per reading, three variables</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'qs2')">(7, 5) — it just transposes</button>
+      </div>
+      <div class="quiz-feedback" id="qs2-feedback"></div>
+    </div>
+
+    <div class="step-label">Summary</div>
+    <p class="body-text">The data is now tidy, which is the precondition for everything that follows. Next: plotting relationships between two variables.</p>
+  </div>
+</section>
+
+<section class="chapter" id="s3">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Section 03</span><span class="ch-badge">Live plotter</span></div>
+    <h2 class="ch-title">Relational Plots</h2>
+
+    <div class="step-label">lineplot — trends over an ordered variable</div>
+    <p class="body-text">The payoff for tidying the data: one call draws every city, colors them, and builds the legend.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body">sns.lineplot(data=df, x=<span class="str">"day"</span>, y=<span class="str">"temp"</span>, hue=<span class="str">"city"</span>, marker=<span class="str">"o"</span>)</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>(five colored lines, one per city, with an automatic legend)</pre></div>
+    </div>
+    <p class="body-text">Compare that to the Matplotlib version from the previous note, which needed an explicit loop, five manual <span class="mono">label=</span> arguments and a <span class="mono">legend()</span> call.</p>
+
+    <div class="step-label">The hue parameter — interactive</div>
+    <p class="body-text">Turn <span class="mono">hue</span> on and off. Without it, Seaborn treats all 35 rows as one group and aggregates them into a single line with a confidence band.</p>
+    <div class="playground">
+      <div class="pg-controls">
+        <div class="pg-field"><label>hue=</label>
+          <select id="rel-hue" onchange="applyRel()">
+            <option value="city">"city" — one line per city</option>
+            <option value="none">None — aggregate all rows</option>
+          </select>
+        </div>
+        <div class="pg-field"><label>Chart</label>
+          <select id="rel-kind" onchange="applyRel()">
+            <option value="line">sns.lineplot()</option>
+            <option value="scatter">sns.scatterplot()</option>
+          </select>
+        </div>
+      </div>
+      <div class="code-block" style="margin-top:6px;"><pre class="code-body" id="rel-code" style="padding:12px 16px; font-size:13px;"></pre></div>
+      <div class="chart-shell"><svg class="chart-svg" viewBox="0 0 640 320" xmlns="http://www.w3.org/2000/svg" id="rel-chart-svg"></svg></div>
+      <p class="body-text" id="rel-note" style="margin-top:8px; margin-bottom:0;"></p>
+    </div>
+
+    <div class="info-card insight">
+      <span class="info-label">Data Science Insight</span>
+      <p>When several rows share the same x value, <span class="mono">lineplot</span> doesn't draw them all — it plots the <strong class="emph">mean</strong> and shades a confidence interval around it. That shaded band is Seaborn doing inferential statistics for you, quietly, by default.</p>
+    </div>
+
+    <div class="step-label">scatterplot — relationships without order</div>
+    <p class="body-text">Same grammar, different geometry. Here each city becomes one point: average temperature against day-to-day volatility.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body">summary = df.groupby(<span class="str">"city"</span>)[<span class="str">"temp"</span>].agg([<span class="str">"mean"</span>, <span class="str">"std"</span>]).reset_index()
+sns.scatterplot(data=summary, x=<span class="str">"mean"</span>, y=<span class="str">"std"</span>, hue=<span class="str">"city"</span>, s=<span class="str">120</span>)</pre>
+    </div>
+    <div class="chart-shell"><svg class="chart-svg" viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" id="scatter-chart-svg"></svg></div>
+
+    <div class="info-card mistake">
+      <span class="info-label">Common Mistake</span>
+      <p>Being surprised by the shaded band around a line and assuming it's a bug. It's the 95% confidence interval, computed by bootstrapping. If you want the raw lines with no interval, pass <span class="mono">errorbar=None</span>.</p>
+    </div>
+
+    <div class="step-label">Practice challenge</div>
+    <div class="quiz-block">
+      <div class="quiz-q">You call <span class="mono">sns.lineplot(data=df, x="day", y="temp")</span> with no <span class="mono">hue</span>. What gets drawn?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'qs3')">Five separate lines, uncolored</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'qs3')">One line of the mean per day, with a confidence band</button>
+      </div>
+      <div class="quiz-feedback" id="qs3-feedback"></div>
+    </div>
+
+    <div class="step-label">Summary</div>
+    <p class="body-text">You can now plot relationships and split them by a category with a single keyword. Next: looking at the shape of a single variable.</p>
+  </div>
+</section>
+
+<section class="chapter" id="s4">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Section 04</span><span class="ch-badge">Live plotter</span></div>
+    <h2 class="ch-title">Distribution Plots</h2>
+
+    <div class="step-label">histplot — counts in bins</div>
+    <p class="body-text">Same idea as Matplotlib's <span class="mono">hist()</span>, but it reads a column by name and can split by category.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body">sns.histplot(data=df, x=<span class="str">"temp"</span>, bins=<span class="str">7</span>, kde=<span class="kw">True</span>)</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>(7 bars covering 2°C to 33°C, with a smooth density curve overlaid)</pre></div>
+    </div>
+
+    <div class="step-label">kdeplot — a smooth density estimate</div>
+    <p class="body-text">A KDE replaces bars with a continuous curve. It makes no bin-boundary decisions, but it does make a smoothing decision instead — controlled by the bandwidth.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body">sns.kdeplot(data=df, x=<span class="str">"temp"</span>, fill=<span class="kw">True</span>, bw_adjust=<span class="str">1</span>)</pre>
+    </div>
+
+    <div class="step-label">Distribution explorer — interactive</div>
+    <p class="body-text">All 35 readings. Switch representations and watch how the same numbers can look smooth or lumpy depending entirely on your settings.</p>
+    <div class="playground">
+      <div class="pg-controls">
+        <div class="pg-field"><label>Plot type</label>
+          <select id="dist-kind" onchange="applyDist()">
+            <option value="hist">histplot</option>
+            <option value="kde">kdeplot</option>
+            <option value="both" selected>histplot(kde=True)</option>
+          </select>
+        </div>
+        <div class="pg-field"><label>bins</label><input type="number" id="dist-bins" value="7" min="3" max="14" oninput="applyDist()"></div>
+        <div class="pg-field"><label>bw_adjust</label><input type="number" id="dist-bw" value="1" min="0.3" max="3" step="0.1" oninput="applyDist()"></div>
+      </div>
+      <div class="code-block" style="margin-top:6px;"><pre class="code-body" id="dist-code" style="padding:12px 16px; font-size:13px;"></pre></div>
+      <div class="chart-shell"><svg class="chart-svg" viewBox="0 0 640 310" xmlns="http://www.w3.org/2000/svg" id="dist-chart-svg"></svg></div>
+    </div>
+
+    <div class="info-card insight">
+      <span class="info-label">Data Science Insight</span>
+      <p>Lower <span class="mono">bw_adjust</span> makes the curve follow the data more closely, revealing detail — and noise. Higher values smooth it toward a single hump. Neither is "correct"; the curve is an estimate, and the bandwidth is your assumption about how much structure is real.</p>
+    </div>
+
+    <div class="step-label">Why this distribution is bimodal</div>
+    <p class="body-text">The curve has two clear humps because the dataset mixes a very cold city with several warm ones. That's a real feature of the data, not an artifact — and it's exactly the kind of thing a mean would hide.</p>
+    <div id="dist-stats" class="prop-grid"></div>
+
+    <div class="info-card mistake">
+      <span class="info-label">Common Mistake</span>
+      <p>Reading the y-axis of a KDE as a probability. It's a <strong class="emph">density</strong> — the area under the curve sums to 1, not the height. A peak of 0.04 doesn't mean "4% chance"; only an area between two x values has that meaning.</p>
+    </div>
+
+    <div class="step-label">Practice challenge</div>
+    <div class="quiz-block">
+      <div class="quiz-q">Raising <span class="mono">bw_adjust</span> from 0.5 to 2.0 does what to a KDE curve?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'qs4')">Smooths it — detail is flattened toward a broader shape</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'qs4')">Adds more data points, making it more accurate</button>
+      </div>
+      <div class="quiz-feedback" id="qs4-feedback"></div>
+    </div>
+
+    <div class="step-label">Summary</div>
+    <p class="body-text">You can now show the shape of one variable, and you know the smoothing choice hidden inside a KDE. Next: comparing distributions across categories.</p>
+  </div>
+</section>
+
+<section class="chapter" id="s5">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Section 05</span><span class="ch-badge">Live plotter</span></div>
+    <h2 class="ch-title">Categorical Plots</h2>
+
+    <div class="step-label">The family</div>
+    <p class="body-text">Categorical plots put a category on one axis and a numeric variable on the other. They differ only in how much of the distribution they show.</p>
+    <table class="fmt-table">
+      <tr><th>Function</th><th>Shows</th><th>Best when</th></tr>
+      <tr><td>sns.barplot()</td><td>A single summary (mean) per category, plus error bars</td><td>You want the headline number</td></tr>
+      <tr><td>sns.boxplot()</td><td>Median, quartiles, whiskers, outliers</td><td>You want the spread, compactly</td></tr>
+      <tr><td>sns.violinplot()</td><td>Full density shape per category</td><td>The shape itself matters (bimodal? skewed?)</td></tr>
+      <tr><td>sns.stripplot()</td><td>Every individual observation as a dot</td><td>Few data points — show them all</td></tr>
+      <tr><td>sns.countplot()</td><td>How many rows per category</td><td>Counting, not measuring</td></tr>
+    </table>
+
+    <div class="step-label">barplot — what the one-liner hides</div>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body">sns.barplot(data=df, x=<span class="str">"city"</span>, y=<span class="str">"temp"</span>)</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>(5 bars at each city's mean temperature, each with a vertical error bar)</pre></div>
+    </div>
+    <p class="body-text">Seaborn grouped the 35 rows by city, took the mean of each group, bootstrapped a confidence interval, and drew it — none of which you asked for explicitly.</p>
+
+    <div class="step-label">Reading a boxplot</div>
+    <p class="body-text">Every box encodes five numbers. Here's the anatomy, drawn from Tokyo's actual week:</p>
+    <div class="chart-shell"><svg class="chart-svg" viewBox="0 0 640 250" xmlns="http://www.w3.org/2000/svg" id="boxanatomy-svg"></svg></div>
+
+    <div class="step-label">Categorical plot switcher — interactive</div>
+    <p class="body-text">Same tidy DataFrame, five ways of summarizing it. Notice how much information each one keeps or discards.</p>
+    <div class="playground">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="setCat('bar', this)">barplot</button>
+        <button class="tab-btn" onclick="setCat('box', this)">boxplot</button>
+        <button class="tab-btn" onclick="setCat('violin', this)">violinplot</button>
+        <button class="tab-btn" onclick="setCat('strip', this)">stripplot</button>
+      </div>
+      <div class="code-block" style="margin-top:14px;"><pre class="code-body" id="cat-code" style="padding:12px 16px; font-size:13px;"></pre></div>
+      <div class="chart-shell"><svg class="chart-svg" viewBox="0 0 640 320" xmlns="http://www.w3.org/2000/svg" id="cat-chart-svg"></svg></div>
+      <p class="body-text" id="cat-note" style="margin-top:8px; margin-bottom:0;"></p>
+    </div>
+
+    <div class="info-card usecase">
+      <span class="info-label">Real-World Use Case</span>
+      <p>A bar chart of group means is the most common chart in published research and the most criticized — two groups with identical means can have completely different spreads. Overlaying a <span class="mono">stripplot</span> on a <span class="mono">boxplot</span> shows both the summary and the raw points, which is why that combination is standard practice.</p>
+    </div>
+
+    <div class="info-card mistake">
+      <span class="info-label">Common Mistake</span>
+      <p>Using a violinplot on very few observations per group. With seven readings per city, the "density curve" is mostly the KDE's smoothing assumption rather than real structure in the data. Boxplot or stripplot is the more honest choice at this sample size.</p>
+    </div>
+
+    <div class="step-label">Practice challenge</div>
+    <div class="quiz-block">
+      <div class="quiz-q">Which of these keeps every individual observation visible?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'qs5')">barplot — each bar is built from the raw values</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'qs5')">stripplot — one dot per row</button>
+      </div>
+      <div class="quiz-feedback" id="qs5-feedback"></div>
+    </div>
+
+    <div class="step-label">Summary</div>
+    <p class="body-text">You can now compare distributions across categories and choose a plot by how much it reveals. Next: controlling how all of it looks.</p>
+  </div>
+</section>
+
+<section class="chapter" id="s6">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Section 06</span><span class="ch-badge">Live styler</span></div>
+    <h2 class="ch-title">Themes &amp; Palettes</h2>
+
+    <div class="step-label">set_theme — one call, global effect</div>
+    <p class="body-text"><span class="mono">sns.set_theme()</span> takes three separable arguments: a <strong class="emph">style</strong> (background and grid), a <strong class="emph">context</strong> (element scaling), and a <strong class="emph">palette</strong> (colors).</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button></div></div>
+      <pre class="code-body">sns.set_theme(style=<span class="str">"whitegrid"</span>, context=<span class="str">"notebook"</span>, palette=<span class="str">"deep"</span>)</pre>
+    </div>
+    <table class="fmt-table">
+      <tr><th>Argument</th><th>Options</th><th>Controls</th></tr>
+      <tr><td>style=</td><td>darkgrid, whitegrid, dark, white, ticks</td><td>Background color and gridlines</td></tr>
+      <tr><td>context=</td><td>paper, notebook, talk, poster</td><td>Size of labels, lines and markers</td></tr>
+      <tr><td>palette=</td><td>deep, muted, pastel, viridis, coolwarm…</td><td>The color sequence used for groups</td></tr>
+    </table>
+
+    <div class="info-card tip">
+      <span class="info-label">Pro Tip</span>
+      <p><span class="mono">context="talk"</span> or <span class="mono">"poster"</span> scales up every text element at once — far easier than hand-tuning a dozen <span class="mono">fontsize</span> arguments when a chart is going on a slide.</p>
+    </div>
+
+    <div class="step-label">Three kinds of palette</div>
+    <p class="body-text">Choosing a palette isn't decoration — the wrong type actively misleads.</p>
+    <div class="vs-grid" style="grid-template-columns:1fr;">
+      <div class="vs-col">
+        <h4>Qualitative — for unordered categories</h4>
+        <div class="palette-row" id="pal-qual"></div>
+        <p class="body-text" style="font-size:13px; margin-top:6px;">Distinct hues, no implied ranking. Correct for our five cities, which have no natural order.</p>
+      </div>
+      <div class="vs-col">
+        <h4>Sequential — for low-to-high values</h4>
+        <div class="palette-row" id="pal-seq"></div>
+        <p class="body-text" style="font-size:13px; margin-top:6px;">One hue, increasing intensity. Correct for a temperature heatmap.</p>
+      </div>
+      <div class="vs-col">
+        <h4>Diverging — for deviation from a midpoint</h4>
+        <div class="palette-row" id="pal-div"></div>
+        <p class="body-text" style="font-size:13px; margin-top:6px;">Two hues meeting at a neutral center. Correct for "above vs below average."</p>
+      </div>
+    </div>
+
+    <div class="step-label">Theme builder — interactive</div>
+    <p class="body-text">Every control maps directly to an argument in the <span class="mono">set_theme()</span> call above.</p>
+    <div class="playground">
+      <div class="pg-controls">
+        <div class="pg-field"><label>style=</label>
+          <select id="th-style" onchange="applyTheme()">
+            <option value="darkgrid">"darkgrid"</option>
+            <option value="whitegrid" selected>"whitegrid"</option>
+            <option value="white">"white"</option>
+            <option value="ticks">"ticks"</option>
+          </select>
+        </div>
+        <div class="pg-field"><label>context=</label>
+          <select id="th-context" onchange="applyTheme()">
+            <option value="paper">"paper"</option>
+            <option value="notebook" selected>"notebook"</option>
+            <option value="talk">"talk"</option>
+          </select>
+        </div>
+        <div class="pg-field"><label>palette=</label>
+          <select id="th-palette" onchange="applyTheme()">
+            <option value="deep">"deep"</option>
+            <option value="pastel">"pastel"</option>
+            <option value="viridis">"viridis"</option>
+            <option value="coolwarm">"coolwarm"</option>
+          </select>
+        </div>
+      </div>
+      <div class="code-block" style="margin-top:6px;"><pre class="code-body" id="th-code" style="padding:12px 16px; font-size:13px;"></pre></div>
+      <div class="chart-shell"><svg class="chart-svg" viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" id="th-chart-svg"></svg></div>
+    </div>
+
+    <div class="info-card mistake">
+      <span class="info-label">Common Mistake</span>
+      <p>Using a rainbow or diverging palette for unordered categories. Color that varies in brightness implies magnitude, so readers infer a ranking among your cities that doesn't exist. Qualitative palettes keep brightness roughly constant precisely to avoid this.</p>
+    </div>
+
+    <div class="step-label">Practice challenge</div>
+    <div class="quiz-block">
+      <div class="quiz-q">You're coloring a heatmap of temperatures from 2&deg;C to 33&deg;C. Which palette type fits?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'qs6')">Sequential — the values have a clear low-to-high order</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'qs6')">Qualitative — every temperature gets its own distinct hue</button>
+      </div>
+      <div class="quiz-feedback" id="qs6-feedback"></div>
+    </div>
+
+    <div class="step-label">Summary</div>
+    <p class="body-text">You can now control style, scale and color deliberately. Next: heatmaps, and the axes-level vs figure-level distinction.</p>
+  </div>
+</section>
+
+<section class="chapter" id="s7">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Section 07</span><span class="ch-badge">Live grid</span></div>
+    <h2 class="ch-title">Heatmaps &amp; Figure-Level Grids</h2>
+
+    <div class="step-label">heatmap — the one function that wants wide data</div>
+    <p class="body-text">Every other Seaborn function takes long form. <span class="mono">heatmap()</span> is the exception: it expects a rectangular matrix, exactly the wide table from Section 2.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body">matrix = df.pivot(index=<span class="str">"city"</span>, columns=<span class="str">"day"</span>, values=<span class="str">"temp"</span>)
+sns.heatmap(matrix, annot=<span class="kw">True</span>, fmt=<span class="str">"d"</span>, cmap=<span class="str">"YlOrRd"</span>)</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>(a 5x7 grid of colored cells, each labeled with its temperature)</pre></div>
+    </div>
+    <p class="body-text"><span class="mono">pivot()</span> is the inverse of the <span class="mono">melt()</span> from Section 2 — long back to wide.</p>
+
+    <div class="step-label">Heatmap explorer — interactive</div>
+    <div class="playground">
+      <div class="pg-controls">
+        <div class="pg-field"><label>cmap=</label>
+          <select id="hm-cmap" onchange="applyHeat()">
+            <option value="YlOrRd">"YlOrRd" (sequential)</option>
+            <option value="viridis">"viridis" (sequential)</option>
+            <option value="coolwarm">"coolwarm" (diverging)</option>
+          </select>
+        </div>
+        <div class="pg-field"><label>annot=</label>
+          <select id="hm-annot" onchange="applyHeat()">
+            <option value="true">True</option>
+            <option value="false">False</option>
+          </select>
+        </div>
+      </div>
+      <div class="code-block" style="margin-top:6px;"><pre class="code-body" id="hm-code" style="padding:12px 16px; font-size:13px;"></pre></div>
+      <div class="chart-shell"><svg class="chart-svg" viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" id="hm-chart-svg"></svg></div>
+    </div>
+
+    <div class="step-label">Axes-level vs figure-level</div>
+    <p class="body-text">This is Seaborn's second big structural idea. <strong class="emph">Axes-level</strong> functions draw onto one Matplotlib Axes you already have. <strong class="emph">Figure-level</strong> functions create and manage the entire figure themselves — which is what lets them split data into a grid of subplots.</p>
+    <table class="fmt-table">
+      <tr><th>Level</th><th>Functions</th><th>Returns</th><th>Supports col= / row=</th></tr>
+      <tr><td>Axes-level</td><td>lineplot, scatterplot, histplot, boxplot, heatmap</td><td>A Matplotlib Axes</td><td>No</td></tr>
+      <tr><td>Figure-level</td><td>relplot, displot, catplot, pairplot, lmplot</td><td>A FacetGrid object</td><td>Yes</td></tr>
+    </table>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body"><span class="cmt"># figure-level: one small chart per city, automatically</span>
+sns.relplot(data=df, x=<span class="str">"day"</span>, y=<span class="str">"temp"</span>,
+            col=<span class="str">"city"</span>, kind=<span class="str">"line"</span>,
+            col_wrap=<span class="str">3</span>, height=<span class="str">2.5</span>, marker=<span class="str">"o"</span>)</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>(a 2x3 FacetGrid — five line charts, one per city, sharing axis ranges)</pre></div>
+    </div>
+    <div class="chart-shell"><svg class="chart-svg" viewBox="0 0 640 340" xmlns="http://www.w3.org/2000/svg" id="facet-chart-svg"></svg></div>
+    <p class="body-text">Compare this to the Matplotlib note's subplot loop: the grid layout, the shared y-axis range, the per-panel titles and the wrapping are all handled by <span class="mono">col=</span> and <span class="mono">col_wrap=</span>.</p>
+
+    <div class="info-card insight">
+      <span class="info-label">Data Science Insight</span>
+      <p>Sharing axis limits across facets is the default and it matters. If each panel auto-scaled independently, Oslo's 2&ndash;6&deg;C week would look identical in shape to Cairo's 28&ndash;33&deg;C week. Shared scales preserve the comparison.</p>
+    </div>
+
+    <div class="info-card mistake">
+      <span class="info-label">Common Mistake</span>
+      <p>Calling <span class="mono">plt.title()</span> after a figure-level function and wondering why it lands on the last panel. Figure-level functions return a FacetGrid, not an Axes — use <span class="mono">g.figure.suptitle()</span> or <span class="mono">g.set_titles()</span> instead.</p>
+    </div>
+
+    <div class="step-label">Practice challenge</div>
+    <div class="quiz-block">
+      <div class="quiz-q">Which function can split data into a grid of subplots with <span class="mono">col="city"</span>?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'qs7')">sns.lineplot() — it's the line-drawing function</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'qs7')">sns.relplot() — figure-level, so it owns the whole figure</button>
+      </div>
+      <div class="quiz-feedback" id="qs7-feedback"></div>
+    </div>
+
+    <div class="step-label">Summary</div>
+    <p class="body-text">You now have the full toolkit: tidy data, relational, distribution and categorical plots, themes, heatmaps and facet grids. Next: all seven, applied end-to-end.</p>
+  </div>
+</section>
+
+<section class="chapter" id="workflow">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Case Study</span><span class="ch-badge">End to end</span></div>
+    <h2 class="ch-title">The Full Workflow, Start to Finish</h2>
+    <p class="body-text">Same dataset, one continuous script — reshape once, then let Seaborn do the statistics for every panel.</p>
+
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">full_workflow.py</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button></div></div>
+      <pre class="code-body"><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> seaborn <span class="kw">as</span> sns
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+sns.set_theme(style=<span class="str">"whitegrid"</span>, context=<span class="str">"notebook"</span>)
+
+<span class="cmt"># 1. The data (from the NumPy note)</span>
+cities = [<span class="str">"Tokyo"</span>, <span class="str">"Cairo"</span>, <span class="str">"Oslo"</span>, <span class="str">"Lima"</span>, <span class="str">"Nairobi"</span>]
+days = [<span class="str">"Mon"</span>, <span class="str">"Tue"</span>, <span class="str">"Wed"</span>, <span class="str">"Thu"</span>, <span class="str">"Fri"</span>, <span class="str">"Sat"</span>, <span class="str">"Sun"</span>]
+temps = np.array([
+    [<span class="str">18</span>, <span class="str">19</span>, <span class="str">21</span>, <span class="str">20</span>, <span class="str">22</span>, <span class="str">23</span>, <span class="str">21</span>],
+    [<span class="str">29</span>, <span class="str">31</span>, <span class="str">30</span>, <span class="str">33</span>, <span class="str">32</span>, <span class="str">30</span>, <span class="str">28</span>],
+    [<span class="str">4</span>,  <span class="str">3</span>,  <span class="str">5</span>,  <span class="str">2</span>,  <span class="str">6</span>,  <span class="str">4</span>,  <span class="str">3</span>],
+    [<span class="str">17</span>, <span class="str">18</span>, <span class="str">16</span>, <span class="str">19</span>, <span class="str">18</span>, <span class="str">17</span>, <span class="str">19</span>],
+    [<span class="str">24</span>, <span class="str">23</span>, <span class="str">25</span>, <span class="str">24</span>, <span class="str">26</span>, <span class="str">25</span>, <span class="str">24</span>],
+])
+
+<span class="cmt"># 2. Reshape to tidy/long — the step everything else depends on</span>
+wide = pd.DataFrame(temps, index=cities, columns=days)
+df = (wide.reset_index()
+        .melt(id_vars=<span class="str">"index"</span>, var_name=<span class="str">"day"</span>, value_name=<span class="str">"temp"</span>)
+        .rename(columns={<span class="str">"index"</span>: <span class="str">"city"</span>}))
+
+<span class="cmt"># 3. Build a 2x2 figure</span>
+fig, axes = plt.subplots(<span class="str">2</span>, <span class="str">2</span>, figsize=(<span class="str">13</span>, <span class="str">9</span>))
+
+<span class="cmt"># 4. Top-left: every city's week (relational, hue does the splitting)</span>
+sns.lineplot(data=df, x=<span class="str">"day"</span>, y=<span class="str">"temp"</span>, hue=<span class="str">"city"</span>,
+             marker=<span class="str">"o"</span>, ax=axes[<span class="str">0</span>, <span class="str">0</span>])
+axes[<span class="str">0</span>, <span class="str">0</span>].set_title(<span class="str">"Weekly Temperatures"</span>)
+
+<span class="cmt"># 5. Top-right: spread per city (categorical — boxplot keeps the quartiles)</span>
+sns.boxplot(data=df, x=<span class="str">"city"</span>, y=<span class="str">"temp"</span>, ax=axes[<span class="str">0</span>, <span class="str">1</span>])
+sns.stripplot(data=df, x=<span class="str">"city"</span>, y=<span class="str">"temp"</span>, color=<span class="str">"black"</span>,
+              size=<span class="str">4</span>, alpha=<span class="str">0.6</span>, ax=axes[<span class="str">0</span>, <span class="str">1</span>])
+axes[<span class="str">0</span>, <span class="str">1</span>].set_title(<span class="str">"Spread by City"</span>)
+
+<span class="cmt"># 6. Bottom-left: distribution of all 35 readings</span>
+sns.histplot(data=df, x=<span class="str">"temp"</span>, bins=<span class="str">7</span>, kde=<span class="kw">True</span>, ax=axes[<span class="str">1</span>, <span class="str">0</span>])
+axes[<span class="str">1</span>, <span class="str">0</span>].set_title(<span class="str">"Distribution of All Readings"</span>)
+
+<span class="cmt"># 7. Bottom-right: heatmap — pivot back to wide first</span>
+matrix = df.pivot(index=<span class="str">"city"</span>, columns=<span class="str">"day"</span>, values=<span class="str">"temp"</span>)
+sns.heatmap(matrix, annot=<span class="kw">True</span>, fmt=<span class="str">"d"</span>, cmap=<span class="str">"YlOrRd"</span>,
+            cbar=<span class="kw">False</span>, ax=axes[<span class="str">1</span>, <span class="str">1</span>])
+axes[<span class="str">1</span>, <span class="str">1</span>].set_title(<span class="str">"City \u00d7 Day Heatmap"</span>)
+
+<span class="cmt"># 8. Finalize through the Matplotlib layer</span>
+fig.tight_layout()
+fig.savefig(<span class="str">"seaborn_report.png"</span>, dpi=<span class="str">300</span>, bbox_inches=<span class="str">"tight"</span>)
+plt.show()</pre>
+    </div>
+
+    <div class="step-label">The resulting figure</div>
+    <div class="chart-shell">
+      <svg class="chart-svg" viewBox="0 0 660 470" xmlns="http://www.w3.org/2000/svg" id="workflow-chart-svg"></svg>
+    </div>
+
+    <div class="step-label">Insights — computed live from this note's real dataset</div>
+    <div class="insight-qa">
+      <div class="qa-item"><div class="qa-q">Which single step makes all four panels possible?</div><div class="qa-a" id="qa-1"></div></div>
+      <div class="qa-item"><div class="qa-q">Which city has the hottest weekly average?</div><div class="qa-a" id="qa-2"></div></div>
+      <div class="qa-item"><div class="qa-q">Which city has the tightest interquartile range — the most predictable week?</div><div class="qa-a" id="qa-3"></div></div>
+      <div class="qa-item"><div class="qa-q">Why does the KDE in the bottom-left panel have more than one hump?</div><div class="qa-a" id="qa-4"></div></div>
+      <div class="qa-item"><div class="qa-q">Which panel required converting back to wide format, and why?</div><div class="qa-a" id="qa-5"></div></div>
+      <div class="qa-item">
+        <div class="qa-q">Full boxplot five-number summary, per city</div>
+        <div id="qa-6-table"></div>
+      </div>
+    </div>
+    <p class="body-text" style="font-size:13px; color:var(--text-faint);">Every answer above is computed live from this exact 5&times;7 array &mdash; not scripted text. Re-derive it yourself against the code above.</p>
+  </div>
+</section>
+
+<section class="chapter" id="practice">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Practice</span><span class="ch-badge">20 questions</span></div>
+    <h2 class="ch-title">Practice Questions</h2>
+    <p class="body-text">Twenty questions, spanning everything from Section 1 to Section 7. Instant feedback, every time.</p>
+
+    <div class="quiz-block"><span class="quiz-tag">Core Concepts</span>
+      <div class="quiz-q">What is Seaborn's relationship to Matplotlib?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p1')">It's built on top of it — every Seaborn chart is a Matplotlib figure</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p1')">It's a competing library that replaces Matplotlib entirely</button>
+      </div>
+      <div class="quiz-feedback" id="p1-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Core Concepts</span>
+      <div class="quiz-q">What does "tidy data" mean in Seaborn's sense?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p2')">One row per observation, one column per variable</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p2')">Data with no missing values or duplicates</button>
+      </div>
+      <div class="quiz-feedback" id="p2-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Tidy Data</span>
+      <div class="quiz-q">A 5&times;7 wide table is melted to long form. How many rows result?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p3')">35 — one row per individual value</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p3')">12 — 5 plus 7</button>
+      </div>
+      <div class="quiz-feedback" id="p3-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Tidy Data</span>
+      <div class="quiz-q">Which Pandas method converts long form back to wide?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p4')">pivot()</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p4')">melt()</button>
+      </div>
+      <div class="quiz-feedback" id="p4-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Select the Correct Function</span>
+      <div class="quiz-q">Which parameter splits a plot into one colored series per category?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p5')">hue=</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p5')">color=</button>
+      </div>
+      <div class="quiz-feedback" id="p5-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Select the Correct Function</span>
+      <div class="quiz-q">Which shows median, quartiles and outliers in one compact shape?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p6')">sns.boxplot()</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p6')">sns.barplot()</button>
+      </div>
+      <div class="quiz-feedback" id="p6-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Select the Correct Function</span>
+      <div class="quiz-q">Which is the only common Seaborn function that expects <em>wide</em> data?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p7')">sns.heatmap()</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p7')">sns.lineplot()</button>
+      </div>
+      <div class="quiz-feedback" id="p7-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Statistics</span>
+      <div class="quiz-q">What does the shaded band around a <span class="mono">lineplot</span> represent by default?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p8')">A 95% confidence interval around the mean</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p8')">The full min-to-max range of the data</button>
+      </div>
+      <div class="quiz-feedback" id="p8-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Statistics</span>
+      <div class="quiz-q">What does <span class="mono">sns.barplot()</span> put at the top of each bar?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p9')">The mean of that category's values</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p9')">The sum of that category's values</button>
+      </div>
+      <div class="quiz-feedback" id="p9-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Statistics</span>
+      <div class="quiz-q">The y-axis of a KDE plot shows density. What actually integrates to 1?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p10')">The area under the curve, not the heights</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p10')">The sum of the y-values at each point</button>
+      </div>
+      <div class="quiz-feedback" id="p10-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Find the Error</span>
+      <div class="quiz-q">This raises a KeyError. Why?</div>
+      <pre class="quiz-code">wide = pd.DataFrame(temps, index=cities, columns=days)
+sns.lineplot(data=wide, x=<span class="str">"day"</span>, y=<span class="str">"temp"</span>, hue=<span class="str">"city"</span>)</pre>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p11')">wide has no "day", "temp" or "city" columns — it needs melting first</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p11')">lineplot doesn't support the hue parameter</button>
+      </div>
+      <div class="quiz-feedback" id="p11-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Find the Error</span>
+      <div class="quiz-q">This raises a TypeError. Why?</div>
+      <pre class="quiz-code">sns.boxplot(data=df, x=<span class="str">"city"</span>, y=<span class="str">"temp"</span>, col=<span class="str">"city"</span>)</pre>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p12')">boxplot is axes-level — only figure-level functions accept col=</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p12')">You can't use the same column for both x and col</button>
+      </div>
+      <div class="quiz-feedback" id="p12-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Find the Error</span>
+      <div class="quiz-q">A title set after a figure-level call lands on the wrong panel. What's the fix?</div>
+      <pre class="quiz-code">g = sns.relplot(data=df, x=<span class="str">"day"</span>, y=<span class="str">"temp"</span>, col=<span class="str">"city"</span>)
+plt.title(<span class="str">"Weekly Temperatures"</span>)</pre>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p13')">Use g.figure.suptitle() — relplot returns a FacetGrid, not an Axes</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p13')">Call plt.title() before relplot instead</button>
+      </div>
+      <div class="quiz-feedback" id="p13-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Complete the Code</span>
+      <div class="quiz-q">Fill in the blank to color each city differently:</div>
+      <pre class="quiz-code">sns.lineplot(data=df, x=<span class="str">"day"</span>, y=<span class="str">"temp"</span>, ____=<span class="str">"city"</span>)</pre>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p14')">hue</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p14')">legend</button>
+      </div>
+      <div class="quiz-feedback" id="p14-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Complete the Code</span>
+      <div class="quiz-q">Fill in the blank to write the value inside each heatmap cell:</div>
+      <pre class="quiz-code">sns.heatmap(matrix, ____=<span class="kw">True</span>, fmt=<span class="str">"d"</span>)</pre>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p15')">annot</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p15')">label</button>
+      </div>
+      <div class="quiz-feedback" id="p15-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Complete the Code</span>
+      <div class="quiz-q">Fill in the blank to draw one panel per city, wrapping after 3:</div>
+      <pre class="quiz-code">sns.relplot(data=df, x=<span class="str">"day"</span>, y=<span class="str">"temp"</span>, ____=<span class="str">"city"</span>, col_wrap=<span class="str">3</span>)</pre>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p16')">col</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p16')">hue</button>
+      </div>
+      <div class="quiz-feedback" id="p16-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Palettes</span>
+      <div class="quiz-q">Why is a rainbow palette a poor choice for five unordered cities?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p17')">Its brightness varies, so readers infer a ranking that doesn't exist</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p17')">Seaborn doesn't support more than four colors</button>
+      </div>
+      <div class="quiz-feedback" id="p17-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Palettes</span>
+      <div class="quiz-q">You're shading "degrees above or below the weekly average." Which palette type?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p18')">Diverging — two hues meeting at a neutral midpoint</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p18')">Sequential — one hue increasing in intensity</button>
+      </div>
+      <div class="quiz-feedback" id="p18-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Judgment</span>
+      <div class="quiz-q">Why is a violinplot questionable with only 7 readings per city?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p19')">The density curve mostly reflects KDE smoothing, not real structure</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p19')">violinplot requires at least 30 observations to run</button>
+      </div>
+      <div class="quiz-feedback" id="p19-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Judgment</span>
+      <div class="quiz-q">Why do practitioners often overlay a stripplot on a boxplot?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p20')">It shows the summary and the raw observations behind it at once</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p20')">Boxplots can't be drawn without a stripplot underneath</button>
+      </div>
+      <div class="quiz-feedback" id="p20-feedback"></div>
+    </div>
+  </div>
+</section>
+
+<section id="final-summary">
+  <div class="wrap" style="text-align:center;">
+    <h2 class="ch-title">From Tidy Data to Statistical Figures</h2>
+    <div class="roadmap-flow" style="justify-content:center;">
+      <span class="roadmap-step">Why Seaborn</span><span class="roadmap-arrow">&rarr;</span>
+      <span class="roadmap-step">Tidy Data</span><span class="roadmap-arrow">&rarr;</span>
+      <span class="roadmap-step">Relational</span><span class="roadmap-arrow">&rarr;</span>
+      <span class="roadmap-step">Distribution</span><span class="roadmap-arrow">&rarr;</span>
+      <span class="roadmap-step">Categorical</span><span class="roadmap-arrow">&rarr;</span>
+      <span class="roadmap-step">Themes &amp; Palettes</span><span class="roadmap-arrow">&rarr;</span>
+      <span class="roadmap-step final">Heatmaps &amp; Grids</span>
+    </div>
+    <p class="pull-quote" style="text-align:left; display:inline-block;">Seaborn's real lesson isn't its function names — it's that once your data is shaped correctly, the chart is almost an afterthought.</p>
+    <p class="body-text" style="margin:0 auto;">NumPy computed it, Pandas organized it, Matplotlib drew it, Seaborn made the statistics visible. Four notes, one 5&times;7 array, carried the whole way.</p>
+  </div>
+</section>
+
+<footer>Ruhi Practice Hub &mdash; Seaborn: The Complete Note &middot; All 7 sections, workflow, and 20+ practice questions built. Theme and Template taken from Not Your College & backend generated from Claude AI</footer>
+
+<script>
+  // ---------- theme toggle / chrome ----------
+  const sunPath='M12 4.5V2M12 22v-2.5M4.5 12H2M22 12h-2.5M5.6 5.6 4 4M20 20l-1.6-1.6M18.4 5.6 20 4M4 20l1.6-1.6M12 8a4 4 0 100 8 4 4 0 000-8z';
+  const moonPath='M21 12.8A9 9 0 1111.2 3 7 7 0 0021 12.8z';
+  const icon=document.getElementById('theme-icon');
+  function setIcon(t){ icon.innerHTML='<path d="'+(t==='dark'?sunPath:moonPath)+'"/>'; }
+  setIcon('dark');
+  function toggleTheme(){
+    const h=document.documentElement;
+    const n=h.getAttribute('data-theme')==='dark'?'light':'dark';
+    h.setAttribute('data-theme',n); setIcon(n);
+  }
+  window.addEventListener('scroll',()=>{
+    const h=document.documentElement;
+    document.getElementById('progress-bar').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';
+    document.getElementById('back-to-top').classList.toggle('show',h.scrollTop>600);
+  });
+  const ecoNodes=document.querySelectorAll('.eco-node'), ecoPaths=document.querySelectorAll('.eco-path');
+  const ecoObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){
+    ecoNodes.forEach((n,i)=>setTimeout(()=>n.classList.add('visible'),i*100));
+    ecoPaths.forEach((p,i)=>setTimeout(()=>p.classList.add('visible'),200+i*100));
+    ecoObs.disconnect();
+  }});},{threshold:0.3});
+  document.querySelectorAll('.diagram-shell').forEach(el=>ecoObs.observe(el));
+  function copyCode(btn){
+    const c=btn.closest('.code-block').querySelector('.code-body').innerText;
+    navigator.clipboard.writeText(c);
+    const o=btn.innerText; btn.innerText='Copied'; setTimeout(()=>btn.innerText=o,1200);
+  }
+  function runCode(btn){ const o=btn.closest('.code-block').querySelector('.code-output'); if(o) o.classList.add('show'); }
+
+  // ---------- dataset ----------
+  const cities=['Tokyo','Cairo','Oslo','Lima','Nairobi'];
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const temps=[
+    [18,19,21,20,22,23,21],
+    [29,31,30,33,32,30,28],
+    [4, 3, 5, 2, 6, 4, 3],
+    [17,18,16,19,18,17,19],
+    [24,23,25,24,26,25,24],
+  ];
+  // long/tidy form: {city, day, temp}
+  const longRows=[];
+  days.forEach((d,j)=>cities.forEach((c,i)=>longRows.push({city:c,day:d,temp:temps[i][j]})));
+  const allTemps=temps.flat();
+
+  const PAL={
+    deep:['#4c72b0','#dd8452','#55a868','#c44e52','#8172b3'],
+    pastel:['#a1c9f4','#ffb482','#8de5a1','#ff9f9b','#d0bbff'],
+    viridis:['#440154','#3b528b','#21918c','#5ec962','#fde725'],
+    coolwarm:['#3b4cc0','#7b9ff9','#dddddd','#f49a7b','#b40426'],
+  };
+  const palette=PAL.deep;
+
+  const mean=a=>a.reduce((x,y)=>x+y,0)/a.length;
+  const stdev=a=>{const m=mean(a);return Math.sqrt(mean(a.map(v=>(v-m)**2)));};
+  // linear-interpolation percentile, matching numpy's default
+  function pct(arr,p){
+    const s=[...arr].sort((a,b)=>a-b), idx=(s.length-1)*p/100;
+    const lo=Math.floor(idx), hi=Math.ceil(idx);
+    return lo===hi ? s[lo] : s[lo]+(s[hi]-s[lo])*(idx-lo);
+  }
+  function boxStats(v){
+    const q1=pct(v,25), med=pct(v,50), q3=pct(v,75), iqr=q3-q1;
+    const loF=q1-1.5*iqr, hiF=q3+1.5*iqr;
+    const inl=v.filter(x=>x>=loF&&x<=hiF);
+    return { q1,med,q3,iqr, lo:Math.min(...inl), hi:Math.max(...inl),
+             outliers:v.filter(x=>x<loF||x>hiF) };
+  }
+  // gaussian KDE
+  function kde(data,bwAdjust,xs){
+    const n=data.length, s=stdev(data);
+    const h=1.06*s*Math.pow(n,-0.2)*bwAdjust;
+    return xs.map(x=>mean(data.map(d=>Math.exp(-0.5*((x-d)/h)**2)/(h*Math.sqrt(2*Math.PI)))));
+  }
+  function linspace(a,b,n){ return Array.from({length:n},(_,i)=>a+(b-a)*i/(n-1)); }
+
+  // ---------- svg helpers ----------
+  const NS='http://www.w3.org/2000/svg';
+  function el(tag,attrs,text){
+    const n=document.createElementNS(NS,tag);
+    for(const k in attrs) n.setAttribute(k,attrs[k]);
+    if(text!==undefined) n.textContent=text;
+    return n;
+  }
+  function clearSvg(id){ const s=document.getElementById(id); if(s) s.innerHTML=''; return s; }
+  function scales(box,n,yMin,yMax){
+    return {
+      x:i=>box.x+(n>1?box.w*i/(n-1):0),
+      xBand:(i,m)=>box.x+(box.w/m)*(i+0.5),
+      y:v=>box.y+box.h-((v-yMin)/(yMax-yMin||1))*box.h,
+    };
+  }
+  function frame(svg,box,o){
+    o=o||{};
+    const {yMin,yMax,yTicks=4,xLabels,title,xlabel,ylabel,grid,band,fmt}=o;
+    if(title) svg.appendChild(el('text',{x:box.x+box.w/2,y:box.y-16,class:'chart-title','text-anchor':'middle'},title));
+    for(let i=0;i<=yTicks;i++){
+      const v=yMin+(yMax-yMin)*i/yTicks, yy=box.y+box.h-box.h*i/yTicks;
+      if(grid) svg.appendChild(el('line',{x1:box.x,y1:yy,x2:box.x+box.w,y2:yy,class:'chart-grid'}));
+      svg.appendChild(el('text',{x:box.x-8,y:yy+3.5,class:'chart-tick','text-anchor':'end'}, fmt?fmt(v):Math.round(v)));
+    }
+    svg.appendChild(el('line',{x1:box.x,y1:box.y,x2:box.x,y2:box.y+box.h,class:'chart-axis'}));
+    svg.appendChild(el('line',{x1:box.x,y1:box.y+box.h,x2:box.x+box.w,y2:box.y+box.h,class:'chart-axis'}));
+    if(xLabels){
+      const n=xLabels.length;
+      xLabels.forEach((l,i)=>{
+        const xx=band?box.x+(box.w/n)*(i+0.5):box.x+(n>1?box.w*i/(n-1):0);
+        svg.appendChild(el('text',{x:xx,y:box.y+box.h+18,class:'chart-tick','text-anchor':'middle'},l));
+      });
+    }
+    if(xlabel) svg.appendChild(el('text',{x:box.x+box.w/2,y:box.y+box.h+40,class:'chart-label','text-anchor':'middle'},xlabel));
+    if(ylabel) svg.appendChild(el('text',{x:box.x-44,y:box.y+box.h/2,class:'chart-label','text-anchor':'middle',transform:`rotate(-90 ${box.x-44} ${box.y+box.h/2})`},ylabel));
+  }
+  function bounds(vals,pad){
+    const lo=Math.min(...vals), hi=Math.max(...vals);
+    const p=pad===undefined?((hi-lo)*0.15||1):pad;
+    return {yMin:Math.floor(lo-p),yMax:Math.ceil(hi+p)};
+  }
+  function lineSeries(svg,sc,data,color,o){
+    o=o||{};
+    const poly=el('polyline',{points:data.map((v,i)=>`${sc.x(i)},${sc.y(v)}`).join(' '),
+      fill:'none',stroke:color,'stroke-width':o.width||2.4,'stroke-linejoin':'round','stroke-linecap':'round'});
+    svg.appendChild(poly);
+    poly.style.strokeDasharray=700; poly.style.strokeDashoffset=700;
+    poly.style.transition='stroke-dashoffset .8s ease';
+    requestAnimationFrame(()=>poly.style.strokeDashoffset=0);
+    if(o.marker) data.forEach((v,i)=>svg.appendChild(el('circle',{cx:sc.x(i),cy:sc.y(v),r:o.r||4,fill:color})));
+  }
+  function svgLegend(svg,box,items){
+    let ly=box.y+6;
+    items.forEach(it=>{
+      svg.appendChild(el('line',{x1:box.x+box.w+14,y1:ly,x2:box.x+box.w+32,y2:ly,stroke:it.color,'stroke-width':3.5}));
+      svg.appendChild(el('text',{x:box.x+box.w+38,y:ly+4,class:'chart-tick'},it.label));
+      ly+=20;
+    });
+  }
+  function colorScale(name,t){
+    const stops=PAL[name]||PAL.viridis;
+    const x=Math.max(0,Math.min(1,t))*(stops.length-1);
+    const i=Math.floor(x), f=x-i;
+    if(i>=stops.length-1) return stops[stops.length-1];
+    const hex=s=>[parseInt(s.slice(1,3),16),parseInt(s.slice(3,5),16),parseInt(s.slice(5,7),16)];
+    const a=hex(stops[i]), b=hex(stops[i+1]);
+    const m=a.map((v,k)=>Math.round(v+(b[k]-v)*f));
+    return `rgb(${m[0]},${m[1]},${m[2]})`;
+  }
+  const YLORRD=['#ffffb2','#fecc5c','#fd8d3c','#f03b20','#bd0026'];
+  PAL.YlOrRd=YLORRD;
+
+  // ---------- table renderer ----------
+  function table(containerId,rows,rowLabels,colLabels,opts){
+    opts=opts||{};
+    const c=document.getElementById(containerId); if(!c) return;
+    let h='<div class="df-wrap"><table class="df-table"><thead><tr>';
+    h+= opts.noIndex?'':'<th class="df-index-h"></th>';
+    colLabels.forEach(cl=>h+=`<th style="text-align:right;">${cl}</th>`);
+    h+='</tr></thead><tbody>';
+    rows.forEach((r,i)=>{
+      h+='<tr>';
+      if(!opts.noIndex) h+=`<td class="df-index">${rowLabels[i]}</td>`;
+      r.forEach(v=>h+=`<td class="df-cell" style="text-align:right;">${v}</td>`);
+      h+='</tr>';
+    });
+    c.innerHTML=h+'</tbody></table></div>';
+    c.querySelectorAll('tbody tr').forEach((tr,i)=>tr.style.animation=`rowEnter .3s ease ${Math.min(i,12)*0.025}s both`);
+  }
+
+  // ---------- s1: plain vs themed ----------
+  function miniChart(id,themed){
+    const svg=clearSvg(id); if(!svg) return;
+    const box={x:42,y:28,w:250,h:130};
+    const b=bounds(temps[0]);
+    if(themed){
+      svg.appendChild(el('rect',{x:box.x,y:box.y,width:box.w,height:box.h,fill:'rgba(125,135,160,.13)'}));
+      for(let i=0;i<=4;i++){
+        const yy=box.y+box.h-box.h*i/4;
+        svg.appendChild(el('line',{x1:box.x,y1:yy,x2:box.x+box.w,y2:yy,stroke:'var(--bg)','stroke-width':1.5}));
+      }
+    }
+    for(let i=0;i<=4;i++){
+      const v=b.yMin+(b.yMax-b.yMin)*i/4, yy=box.y+box.h-box.h*i/4;
+      svg.appendChild(el('text',{x:box.x-7,y:yy+3.5,class:'chart-tick','text-anchor':'end'},Math.round(v)));
+    }
+    if(!themed){
+      svg.appendChild(el('line',{x1:box.x,y1:box.y,x2:box.x,y2:box.y+box.h,class:'chart-axis'}));
+      svg.appendChild(el('line',{x1:box.x,y1:box.y+box.h,x2:box.x+box.w,y2:box.y+box.h,class:'chart-axis'}));
+    }
+    days.forEach((d,i)=>svg.appendChild(el('text',{x:box.x+box.w*i/6,y:box.y+box.h+17,class:'chart-tick','text-anchor':'middle'},d[0])));
+    const sc=scales(box,7,b.yMin,b.yMax);
+    svg.appendChild(el('polyline',{points:temps[0].map((v,i)=>`${sc.x(i)},${sc.y(v)}`).join(' '),
+      fill:'none',stroke:themed?PAL.deep[0]:'#1f77b4','stroke-width':themed?2.6:1.6,'stroke-linejoin':'round'}));
+    if(themed) temps[0].forEach((v,i)=>svg.appendChild(el('circle',{cx:sc.x(i),cy:sc.y(v),r:3.6,fill:PAL.deep[0]})));
+    svg.appendChild(el('text',{x:box.x+box.w/2,y:box.y-10,class:'chart-title','text-anchor':'middle','font-size':'12px'},'Tokyo'));
+  }
+
+  // ---------- s2: wide vs long ----------
+  function renderWide(id){
+    table(id,temps.map(r=>r.slice()),cities,days);
+  }
+  function showShape(kind,btn){
+    if(btn){btn.closest('.playground').querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+    const d=document.getElementById('shape-desc');
+    if(kind==='wide'){
+      renderWide('shape-table');
+      d.innerHTML='<strong class="emph">Wide.</strong> Compact and readable, but the day variable is stored in column <em>names</em>. There is no column Seaborn can point <span class="mono">x="day"</span> at.';
+    } else {
+      const rows=longRows.map(r=>[r.city,r.day,r.temp]);
+      table('shape-table',rows,null,['city','day','temp'],{noIndex:true});
+      d.innerHTML='<strong class="emph">Long / tidy.</strong> 35 rows, 3 columns. Every variable is addressable by name — which is the entire precondition for Seaborn\'s API.';
+    }
+  }
+
+  // ---------- s3: relational ----------
+  function applyRel(){
+    const hue=document.getElementById('rel-hue').value;
+    const kind=document.getElementById('rel-kind').value;
+    const fn=kind==='line'?'sns.lineplot':'sns.scatterplot';
+    document.getElementById('rel-code').innerText=
+      `${fn}(data=df, x="day", y="temp"${hue==='city'?', hue="city"':''}${kind==='line'?', marker="o"':''})`;
+    const svg=clearSvg('rel-chart-svg'); if(!svg) return;
+    const box={x:62,y:48,w:490,h:200};
+    const b=bounds(allTemps);
+    frame(svg,box,{...b,xLabels:days,title:'Weekly Temperatures',ylabel:'temp',xlabel:'day',grid:true});
+    const sc=scales(box,7,b.yMin,b.yMax);
+    const note=document.getElementById('rel-note');
+    if(hue==='city'){
+      temps.forEach((row,i)=>{
+        if(kind==='line') lineSeries(svg,sc,row,palette[i],{marker:true});
+        else row.forEach((v,j)=>svg.appendChild(el('circle',{cx:sc.x(j),cy:sc.y(v),r:5,fill:palette[i],opacity:.85})));
+      });
+      svgLegend(svg,box,cities.map((c,i)=>({label:c,color:palette[i]})));
+      note.innerHTML='With <span class="mono">hue="city"</span>, Seaborn splits the 35 rows into five groups, assigns a palette color to each, and builds the legend from the column values.';
+    } else {
+      const dayMeans=days.map((_,j)=>mean(temps.map(r=>r[j])));
+      const daySds=days.map((_,j)=>stdev(temps.map(r=>r[j])));
+      if(kind==='line'){
+        // confidence band (approximate, illustrative)
+        const up=dayMeans.map((m,j)=>m+daySds[j]*1.2), dn=dayMeans.map((m,j)=>m-daySds[j]*1.2);
+        const pts=up.map((v,i)=>`${sc.x(i)},${sc.y(v)}`).concat(dn.map((v,i)=>`${sc.x(6-i)},${sc.y(dn[6-i])}`)).join(' ');
+        svg.appendChild(el('polygon',{points:pts,fill:palette[0],opacity:.2}));
+        lineSeries(svg,sc,dayMeans,palette[0],{marker:true});
+        note.innerHTML='With no <span class="mono">hue</span>, all 35 rows are one group. Seaborn plots the <strong class="emph">mean per day</strong> and shades a confidence band around it — the five cities are gone.';
+      } else {
+        longRows.forEach(r=>{
+          const j=days.indexOf(r.day);
+          svg.appendChild(el('circle',{cx:sc.x(j),cy:sc.y(r.temp),r:5,fill:palette[0],opacity:.6}));
+        });
+        note.innerHTML='With no <span class="mono">hue</span>, every one of the 35 rows is drawn in a single color — the points are all there, but you can no longer tell which city each belongs to.';
+      }
+    }
+  }
+  function drawScatterSummary(){
+    const svg=clearSvg('scatter-chart-svg'); if(!svg) return;
+    const box={x:66,y:44,w:470,h:190};
+    const avg=temps.map(mean), sd=temps.map(stdev);
+    const yb=bounds(sd,0.35);
+    const xLo=Math.floor(Math.min(...avg)-3), xHi=Math.ceil(Math.max(...avg)+3);
+    frame(svg,box,{yMin:yb.yMin,yMax:yb.yMax,yTicks:3,
+      xLabels:[xLo,Math.round((xLo+xHi)/2),xHi],title:'Average vs Day-to-Day Swing',
+      xlabel:'mean temp (°C)',ylabel:'std',grid:true,fmt:v=>v.toFixed(1)});
+    const sy=scales(box,3,yb.yMin,yb.yMax);
+    avg.forEach((a,i)=>{
+      const px=box.x+((a-xLo)/(xHi-xLo))*box.w;
+      svg.appendChild(el('circle',{cx:px,cy:sy.y(sd[i]),r:7,fill:palette[i],opacity:.9}));
+      svg.appendChild(el('text',{x:px,y:sy.y(sd[i])-13,class:'chart-tick','text-anchor':'middle'},cities[i]));
+    });
+  }
+
+  // ---------- s4: distributions ----------
+  function histCounts(vals,nbins){
+    const lo=Math.min(...vals), hi=Math.max(...vals), w=(hi-lo)/nbins;
+    const c=new Array(nbins).fill(0);
+    vals.forEach(v=>{let k=Math.floor((v-lo)/w); if(k>=nbins)k=nbins-1; if(k<0)k=0; c[k]++;});
+    return {counts:c,lo,hi,w};
+  }
+  function applyDist(){
+    const kind=document.getElementById('dist-kind').value;
+    const nbins=Math.max(3,Math.min(14,parseInt(document.getElementById('dist-bins').value)||7));
+    const bw=Math.max(0.3,Math.min(3,parseFloat(document.getElementById('dist-bw').value)||1));
+    document.getElementById('dist-code').innerText=
+      kind==='kde' ? `sns.kdeplot(data=df, x="temp", fill=True, bw_adjust=${bw})`
+      : kind==='hist' ? `sns.histplot(data=df, x="temp", bins=${nbins})`
+      : `sns.histplot(data=df, x="temp", bins=${nbins}, kde=True)`;
+    const svg=clearSvg('dist-chart-svg'); if(!svg) return;
+    const box={x:64,y:46,w:520,h:190};
+    const {counts,lo,hi,w}=histCounts(allTemps,nbins);
+    const showHist=kind!=='kde', showKde=kind!=='hist';
+    const yMax=showHist?Math.max(...counts)+1:1;
+    const xs=linspace(lo-3,hi+3,140);
+    const dens=kde(allTemps,bw,xs);
+    const densMax=Math.max(...dens);
+    frame(svg,box,{yMin:0,yMax:showHist?yMax:1,yTicks:showHist?Math.min(yMax,5):4,
+      xLabels:counts.map((_,i)=>Math.round(lo+i*w)),band:true,
+      title:`All 35 Readings${showKde?` — bw_adjust=${bw}`:''}`,xlabel:'temp (°C)',
+      ylabel:showHist?'Count':'Density',grid:true,fmt:v=>showHist?Math.round(v):(v*densMax).toFixed(3)});
+    const xPix=v=>box.x+((v-(lo-3))/((hi+3)-(lo-3)))*box.w;
+    if(showHist){
+      const sc=scales(box,nbins,0,yMax), bw2=box.w/nbins;
+      // histogram bars aligned to the binned data range inside the padded axis
+      counts.forEach((c,i)=>{
+        const x0=xPix(lo+i*w), x1=xPix(lo+(i+1)*w);
+        const yTop=sc.y(c);
+        const r=el('rect',{x:x0+0.5,y:box.y+box.h,width:Math.max(1,x1-x0-1),height:0,fill:palette[0],opacity:.8,stroke:'var(--bg)'});
+        svg.appendChild(r);
+        setTimeout(()=>{r.style.transition='all .4s ease';r.setAttribute('y',yTop);r.setAttribute('height',box.y+box.h-yTop);},i*30);
+      });
+    }
+    if(showKde){
+      const yScale=showHist?(v=>box.y+box.h-(v/densMax)*box.h*0.92):(v=>box.y+box.h-(v/densMax)*box.h*0.92);
+      const pts=xs.map((x,i)=>`${xPix(x)},${yScale(dens[i])}`).join(' ');
+      if(kind==='kde'){
+        svg.appendChild(el('polygon',{points:`${box.x},${box.y+box.h} ${pts} ${box.x+box.w},${box.y+box.h}`,fill:palette[0],opacity:.28}));
+      }
+      const p=el('polyline',{points:pts,fill:'none',stroke:kind==='kde'?palette[0]:palette[3],'stroke-width':2.6});
+      svg.appendChild(p);
+      p.style.strokeDasharray=1400; p.style.strokeDashoffset=1400;
+      p.style.transition='stroke-dashoffset .9s ease';
+      requestAnimationFrame(()=>p.style.strokeDashoffset=0);
+    }
+    const oslo=mean(temps[2]);
+    document.getElementById('dist-stats').innerHTML=
+      `<div class="prop-chip">readings: <b>35</b></div>`+
+      `<div class="prop-chip">range: <b>${Math.min(...allTemps)}–${Math.max(...allTemps)}°C</b></div>`+
+      `<div class="prop-chip">overall mean: <b>${mean(allTemps).toFixed(2)}°C</b></div>`+
+      `<div class="prop-chip">Oslo mean: <b>${oslo.toFixed(2)}°C</b></div>`+
+      `<div class="prop-chip">gap to next city: <b>${(Math.min(...[0,1,3,4].map(i=>mean(temps[i])))-oslo).toFixed(2)}°C</b></div>`;
+  }
+
+  // ---------- s5: categorical ----------
+  function drawBoxAnatomy(){
+    const svg=clearSvg('boxanatomy-svg'); if(!svg) return;
+    const v=temps[0], st=boxStats(v);
+    const box={x:120,y:40,w:360,h:150};
+    const lo=15, hi=26;
+    const X=t=>box.x+((t-lo)/(hi-lo))*box.w;
+    const cy=box.y+70, bh=44;
+    svg.appendChild(el('text',{x:box.x+box.w/2,y:box.y-14,class:'chart-title','text-anchor':'middle'},'Tokyo — boxplot anatomy'));
+    // whiskers
+    svg.appendChild(el('line',{x1:X(st.lo),y1:cy,x2:X(st.q1),y2:cy,stroke:'var(--text-faint)','stroke-width':2}));
+    svg.appendChild(el('line',{x1:X(st.q3),y1:cy,x2:X(st.hi),y2:cy,stroke:'var(--text-faint)','stroke-width':2}));
+    [st.lo,st.hi].forEach(t=>svg.appendChild(el('line',{x1:X(t),y1:cy-12,x2:X(t),y2:cy+12,stroke:'var(--text-faint)','stroke-width':2})));
+    // box
+    svg.appendChild(el('rect',{x:X(st.q1),y:cy-bh/2,width:X(st.q3)-X(st.q1),height:bh,fill:palette[0],opacity:.55,stroke:palette[0],'stroke-width':2,rx:2}));
+    svg.appendChild(el('line',{x1:X(st.med),y1:cy-bh/2,x2:X(st.med),y2:cy+bh/2,stroke:'var(--text)','stroke-width':3}));
+    // raw points
+    v.forEach(t=>svg.appendChild(el('circle',{cx:X(t),cy:cy+bh/2+22,r:3.5,fill:'var(--text-faint)'})));
+    svg.appendChild(el('text',{x:box.x-10,y:cy+bh/2+26,class:'chart-tick','text-anchor':'end'},'raw values'));
+    // labels
+    const lbl=(t,txt,dy)=>{
+      svg.appendChild(el('line',{x1:X(t),y1:cy-bh/2-6,x2:X(t),y2:cy-bh/2-dy,stroke:'var(--border)','stroke-width':1}));
+      svg.appendChild(el('text',{x:X(t),y:cy-bh/2-dy-4,class:'chart-tick','text-anchor':'middle'},txt));
+    };
+    lbl(st.lo,`min ${st.lo}`,34);
+    lbl(st.q1,`Q1 ${st.q1}`,12);
+    lbl(st.med,`median ${st.med}`,34);
+    lbl(st.q3,`Q3 ${st.q3}`,12);
+    lbl(st.hi,`max ${st.hi}`,34);
+    svg.appendChild(el('text',{x:box.x+box.w/2,y:box.y+box.h+30,class:'chart-label','text-anchor':'middle'},
+      `IQR = Q3 − Q1 = ${st.q3} − ${st.q1} = ${st.iqr.toFixed(2)}   ·   whiskers reach the furthest point within 1.5×IQR`));
+  }
+  let catKind='bar';
+  function setCat(kind,btn){
+    catKind=kind;
+    if(btn){btn.closest('.playground').querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+    const code={bar:'sns.barplot(data=df, x="city", y="temp")',
+      box:'sns.boxplot(data=df, x="city", y="temp")',
+      violin:'sns.violinplot(data=df, x="city", y="temp")',
+      strip:'sns.stripplot(data=df, x="city", y="temp", jitter=True)'};
+    document.getElementById('cat-code').innerText=code[kind];
+    const notes={
+      bar:'Each bar is the <strong class="emph">mean</strong> of that city\'s seven readings; the vertical line is the confidence interval. Everything about the distribution\'s shape has been discarded.',
+      box:'Now the quartiles are visible. The box spans Q1&ndash;Q3, the thick line is the median, and whiskers reach the furthest point within 1.5&times;IQR.',
+      violin:'The width at each height is a KDE of that city\'s values. With only seven readings per city, most of this shape is smoothing, not data.',
+      strip:'Every one of the 35 rows is drawn. Nothing is summarized and nothing is hidden — practical here precisely because the dataset is small.',
+    };
+    document.getElementById('cat-note').innerHTML=notes[kind];
+    drawCat();
+  }
+  function drawCat(){
+    const svg=clearSvg('cat-chart-svg'); if(!svg) return;
+    const box={x:62,y:46,w:520,h:200};
+    const b={yMin:0,yMax:36};
+    frame(svg,box,{...b,yTicks:6,xLabels:cities,band:true,title:'Temperature by City',ylabel:'temp (°C)',grid:true});
+    const sc=scales(box,5,b.yMin,b.yMax);
+    const slot=box.w/5;
+    temps.forEach((v,i)=>{
+      const cx=sc.xBand(i,5), col=palette[i];
+      if(catKind==='bar'){
+        const m=mean(v), sd=stdev(v), bw=slot*0.55;
+        const yTop=sc.y(m);
+        const r=el('rect',{x:cx-bw/2,y:box.y+box.h,width:bw,height:0,fill:col,opacity:.85,rx:3});
+        svg.appendChild(r);
+        setTimeout(()=>{r.style.transition='all .5s ease';r.setAttribute('y',yTop);r.setAttribute('height',box.y+box.h-yTop);},i*60);
+        svg.appendChild(el('line',{x1:cx,y1:sc.y(m-sd),x2:cx,y2:sc.y(m+sd),stroke:'var(--text)','stroke-width':1.8}));
+        [m-sd,m+sd].forEach(t=>svg.appendChild(el('line',{x1:cx-6,y1:sc.y(t),x2:cx+6,y2:sc.y(t),stroke:'var(--text)','stroke-width':1.8})));
+      } else if(catKind==='box'){
+        const st=boxStats(v), bw=slot*0.42;
+        svg.appendChild(el('line',{x1:cx,y1:sc.y(st.lo),x2:cx,y2:sc.y(st.q1),stroke:'var(--text-faint)','stroke-width':1.8}));
+        svg.appendChild(el('line',{x1:cx,y1:sc.y(st.q3),x2:cx,y2:sc.y(st.hi),stroke:'var(--text-faint)','stroke-width':1.8}));
+        [st.lo,st.hi].forEach(t=>svg.appendChild(el('line',{x1:cx-bw/3,y1:sc.y(t),x2:cx+bw/3,y2:sc.y(t),stroke:'var(--text-faint)','stroke-width':1.8})));
+        svg.appendChild(el('rect',{x:cx-bw/2,y:sc.y(st.q3),width:bw,height:sc.y(st.q1)-sc.y(st.q3),fill:col,opacity:.6,stroke:col,'stroke-width':1.8,rx:2}));
+        svg.appendChild(el('line',{x1:cx-bw/2,y1:sc.y(st.med),x2:cx+bw/2,y2:sc.y(st.med),stroke:'var(--text)','stroke-width':2.6}));
+        st.outliers.forEach(t=>svg.appendChild(el('circle',{cx,cy:sc.y(t),r:3,fill:'none',stroke:'var(--text)'})));
+      } else if(catKind==='violin'){
+        const lo=Math.min(...v)-3, hi=Math.max(...v)+3;
+        const ys=linspace(lo,hi,50), d=kde(v,1,ys);
+        const dm=Math.max(...d), half=slot*0.38;
+        const right=ys.map((y,k)=>`${cx+(d[k]/dm)*half},${sc.y(y)}`);
+        const left=ys.map((y,k)=>`${cx-(d[k]/dm)*half},${sc.y(y)}`).reverse();
+        svg.appendChild(el('polygon',{points:right.concat(left).join(' '),fill:col,opacity:.55,stroke:col,'stroke-width':1.5}));
+        const st=boxStats(v);
+        svg.appendChild(el('line',{x1:cx,y1:sc.y(st.q1),x2:cx,y2:sc.y(st.q3),stroke:'var(--text)','stroke-width':5}));
+        svg.appendChild(el('circle',{cx,cy:sc.y(st.med),r:3,fill:'var(--bg)'}));
+      } else {
+        v.forEach((t,k)=>{
+          const jitter=((k*37)%11-5)/5*slot*0.16;
+          const c=el('circle',{cx:cx+jitter,cy:sc.y(t),r:0,fill:col,opacity:.85});
+          svg.appendChild(c);
+          setTimeout(()=>{c.style.transition='r .3s ease';c.setAttribute('r',5);},(i*7+k)*16);
+        });
+      }
+    });
+  }
+
+  // ---------- s6: themes & palettes ----------
+  function renderPalettes(){
+    const fill=(id,cols)=>{const e=document.getElementById(id); if(e) e.innerHTML=cols.map(c=>`<span style="background:${c}"></span>`).join('');};
+    fill('pal-qual',PAL.deep);
+    fill('pal-seq',linspace(0,1,9).map(t=>colorScale('viridis',t)));
+    fill('pal-div',linspace(0,1,9).map(t=>colorScale('coolwarm',t)));
+  }
+  function applyTheme(){
+    const style=document.getElementById('th-style').value;
+    const ctx=document.getElementById('th-context').value;
+    const pal=document.getElementById('th-palette').value;
+    document.getElementById('th-code').innerText=`sns.set_theme(style="${style}", context="${ctx}", palette="${pal}")`;
+    const svg=clearSvg('th-chart-svg'); if(!svg) return;
+    const scaleF={paper:0.85,notebook:1,talk:1.25}[ctx];
+    const box={x:64,y:46,w:490,h:190};
+    const b={yMin:0,yMax:36};
+    const cols=pal==='deep'||pal==='pastel'
+      ? PAL[pal]
+      : linspace(0,1,5).map(t=>colorScale(pal,t));
+    // background per style
+    if(style==='darkgrid') svg.appendChild(el('rect',{x:box.x,y:box.y,width:box.w,height:box.h,fill:'rgba(125,135,160,.16)'}));
+    const showGrid=(style==='darkgrid'||style==='whitegrid');
+    for(let i=0;i<=6;i++){
+      const v=b.yMin+(b.yMax-b.yMin)*i/6, yy=box.y+box.h-box.h*i/6;
+      if(showGrid) svg.appendChild(el('line',{x1:box.x,y1:yy,x2:box.x+box.w,y2:yy,
+        stroke:style==='darkgrid'?'var(--bg)':'var(--border)','stroke-width':1.4}));
+      svg.appendChild(el('text',{x:box.x-8,y:yy+3.5,class:'chart-tick','text-anchor':'end','font-size':(10.5*scaleF)+'px'},Math.round(v)));
+    }
+    if(style!=='darkgrid'){
+      svg.appendChild(el('line',{x1:box.x,y1:box.y,x2:box.x,y2:box.y+box.h,class:'chart-axis'}));
+      svg.appendChild(el('line',{x1:box.x,y1:box.y+box.h,x2:box.x+box.w,y2:box.y+box.h,class:'chart-axis'}));
+    }
+    if(style==='ticks'){
+      cities.forEach((_,i)=>{
+        const cx=box.x+(box.w/5)*(i+0.5);
+        svg.appendChild(el('line',{x1:cx,y1:box.y+box.h,x2:cx,y2:box.y+box.h+6,class:'chart-axis'}));
+      });
+    }
+    const sc=scales(box,5,b.yMin,b.yMax), bw=(box.w/5)*0.6;
+    temps.forEach((v,i)=>{
+      const m=mean(v), cx=sc.xBand(i,5);
+      svg.appendChild(el('rect',{x:cx-bw/2,y:sc.y(m),width:bw,height:box.y+box.h-sc.y(m),fill:cols[i],opacity:.9,rx:3}));
+    });
+    cities.forEach((c,i)=>svg.appendChild(el('text',{x:sc.xBand(i,5),y:box.y+box.h+19,class:'chart-tick','text-anchor':'middle','font-size':(10.5*scaleF)+'px'},c)));
+    svg.appendChild(el('text',{x:box.x+box.w/2,y:box.y-14,class:'chart-title','text-anchor':'middle','font-size':(14*scaleF)+'px'},'Average Temperature by City'));
+  }
+
+  // ---------- s7: heatmap + facets ----------
+  function applyHeat(){
+    const cmap=document.getElementById('hm-cmap').value;
+    const annot=document.getElementById('hm-annot').value==='true';
+    document.getElementById('hm-code').innerText=
+      `matrix = df.pivot(index="city", columns="day", values="temp")\nsns.heatmap(matrix, annot=${annot?'True':'False'}, fmt="d", cmap="${cmap}")`;
+    const svg=clearSvg('hm-chart-svg'); if(!svg) return;
+    const ox=86, oy=46, cw=62, ch=34;
+    const lo=Math.min(...allTemps), hi=Math.max(...allTemps);
+    svg.appendChild(el('text',{x:ox+cw*3.5,y:oy-18,class:'chart-title','text-anchor':'middle'},'City × Day Temperatures'));
+    days.forEach((d,j)=>svg.appendChild(el('text',{x:ox+cw*j+cw/2,y:oy-5,class:'chart-tick','text-anchor':'middle'},d)));
+    cities.forEach((c,i)=>{
+      svg.appendChild(el('text',{x:ox-8,y:oy+ch*i+ch/2+4,class:'chart-tick','text-anchor':'end'},c));
+      days.forEach((_,j)=>{
+        const v=temps[i][j], t=(v-lo)/(hi-lo);
+        const r=el('rect',{x:ox+cw*j,y:oy+ch*i,width:cw-1.5,height:ch-1.5,fill:colorScale(cmap,t),class:'heat-cell',opacity:0});
+        svg.appendChild(r);
+        setTimeout(()=>{r.style.opacity=1;},(i*7+j)*12);
+        if(annot){
+          const dark = cmap==='viridis' ? t<0.55 : (t>0.68||t<0.12);
+          svg.appendChild(el('text',{x:ox+cw*j+cw/2-0.75,y:oy+ch*i+ch/2+4,class:'chart-tick',
+            'text-anchor':'middle',fill:dark?'#fff':'#1a1a1a','font-weight':'600'},v));
+        }
+      });
+    });
+    // colorbar
+    const cbx=ox+cw*7+18, cbh=ch*5;
+    linspace(0,1,24).forEach((t,k)=>{
+      svg.appendChild(el('rect',{x:cbx,y:oy+cbh-(cbh/24)*(k+1),width:14,height:cbh/24+0.6,fill:colorScale(cmap,t)}));
+    });
+    svg.appendChild(el('text',{x:cbx+20,y:oy+8,class:'chart-tick'},hi));
+    svg.appendChild(el('text',{x:cbx+20,y:oy+cbh,class:'chart-tick'},lo));
+  }
+  function drawFacets(){
+    const svg=clearSvg('facet-chart-svg'); if(!svg) return;
+    const cols=3, rows=2, padX=46, padY=36;
+    const W=640,H=340;
+    const cw=(W-padX*2)/cols, chh=(H-padY*2)/rows;
+    const b=bounds(allTemps); // shared scale — the point of the section
+    for(let k=0;k<6;k++){
+      const r=Math.floor(k/cols), c=k%cols;
+      const bx=padX+c*cw+26, by=padY+r*chh+28, bw=cw-46, bh=chh-62;
+      if(k<cities.length){
+        const sc=scales({x:bx,y:by,w:bw,h:bh},7,b.yMin,b.yMax);
+        svg.appendChild(el('rect',{x:bx,y:by,width:bw,height:bh,fill:'rgba(125,135,160,.10)'}));
+        for(let g=0;g<=3;g++){
+          const yy=by+bh-bh*g/3;
+          svg.appendChild(el('line',{x1:bx,y1:yy,x2:bx+bw,y2:yy,stroke:'var(--bg)','stroke-width':1.2}));
+        }
+        svg.appendChild(el('text',{x:bx+bw/2,y:by-9,class:'chart-title','text-anchor':'middle','font-size':'11.5px'},`city = ${cities[k]}`));
+        const poly=el('polyline',{points:temps[k].map((v,i)=>`${sc.x(i)},${sc.y(v)}`).join(' '),
+          fill:'none',stroke:palette[k],'stroke-width':2,'stroke-linejoin':'round'});
+        poly.style.opacity=0; svg.appendChild(poly);
+        setTimeout(()=>{poly.style.transition='opacity .4s ease';poly.style.opacity=1;},k*90);
+        temps[k].forEach((v,i)=>svg.appendChild(el('circle',{cx:sc.x(i),cy:sc.y(v),r:2.6,fill:palette[k]})));
+        if(c===0){
+          svg.appendChild(el('text',{x:bx-6,y:by+bh+4,class:'chart-tick','text-anchor':'end'},b.yMin));
+          svg.appendChild(el('text',{x:bx-6,y:by+6,class:'chart-tick','text-anchor':'end'},b.yMax));
+        }
+      } else {
+        svg.appendChild(el('text',{x:bx+bw/2,y:by+bh/2+4,class:'chart-tick','text-anchor':'middle'},'(col_wrap leaves this empty)'));
+      }
+    }
+    svg.appendChild(el('text',{x:W/2,y:H-6,class:'chart-label','text-anchor':'middle'},'shared y-axis across all facets — 2°C to 33°C'));
+  }
+
+  // ---------- workflow 2x2 ----------
+  function drawWorkflow(){
+    const svg=clearSvg('workflow-chart-svg'); if(!svg) return;
+    const cellW=310, cellH=195, ox=54, oy=38, gapX=26, gapY=60;
+    // [0,0] lineplot hue=city
+    (function(){
+      const box={x:ox,y:oy,w:cellW-72,h:cellH-64};
+      const b=bounds(allTemps);
+      frame(svg,box,{...b,yTicks:3,xLabels:['M','T','W','T','F','S','S'],title:'Weekly Temperatures',grid:true});
+      const sc=scales(box,7,b.yMin,b.yMax);
+      temps.forEach((row,i)=>svg.appendChild(el('polyline',{points:row.map((v,j)=>`${sc.x(j)},${sc.y(v)}`).join(' '),
+        fill:'none',stroke:palette[i],'stroke-width':1.8})));
+    })();
+    // [0,1] boxplot + strip
+    (function(){
+      const box={x:ox+cellW+gapX,y:oy,w:cellW-72,h:cellH-64};
+      const b={yMin:0,yMax:36};
+      frame(svg,box,{...b,yTicks:3,xLabels:['Tok','Cai','Osl','Lim','Nai'],band:true,title:'Spread by City',grid:true});
+      const sc=scales(box,5,b.yMin,b.yMax), slot=box.w/5;
+      temps.forEach((v,i)=>{
+        const st=boxStats(v), cx=sc.xBand(i,5), bw=slot*0.44;
+        svg.appendChild(el('line',{x1:cx,y1:sc.y(st.lo),x2:cx,y2:sc.y(st.hi),stroke:'var(--text-faint)','stroke-width':1.3}));
+        svg.appendChild(el('rect',{x:cx-bw/2,y:sc.y(st.q3),width:bw,height:Math.max(1,sc.y(st.q1)-sc.y(st.q3)),fill:palette[i],opacity:.6,stroke:palette[i]}));
+        svg.appendChild(el('line',{x1:cx-bw/2,y1:sc.y(st.med),x2:cx+bw/2,y2:sc.y(st.med),stroke:'var(--text)','stroke-width':1.8}));
+        v.forEach((t,k)=>svg.appendChild(el('circle',{cx:cx+((k*37)%9-4)/4*bw*0.3,cy:sc.y(t),r:1.6,fill:'var(--text)',opacity:.65})));
+      });
+    })();
+    // [1,0] histplot + kde
+    (function(){
+      const box={x:ox,y:oy+cellH+gapY,w:cellW-72,h:cellH-64};
+      const {counts,lo,hi,w}=histCounts(allTemps,7);
+      const yMax=Math.max(...counts)+1;
+      frame(svg,box,{yMin:0,yMax,yTicks:3,xLabels:counts.map((_,i)=>Math.round(lo+i*w)),band:true,title:'Distribution of All Readings',grid:true});
+      const sc=scales(box,7,0,yMax), bw=box.w/7;
+      counts.forEach((c,i)=>svg.appendChild(el('rect',{x:box.x+i*bw+0.5,y:sc.y(c),width:bw-1,height:box.y+box.h-sc.y(c),fill:palette[0],opacity:.75,stroke:'var(--bg)'})));
+      const xs=linspace(lo,hi,90), d=kde(allTemps,1,xs), dm=Math.max(...d);
+      const xp=v=>box.x+((v-lo)/(hi-lo))*box.w;
+      svg.appendChild(el('polyline',{points:xs.map((x,i)=>`${xp(x)},${box.y+box.h-(d[i]/dm)*box.h*0.9}`).join(' '),
+        fill:'none',stroke:palette[3],'stroke-width':1.8}));
+    })();
+    // [1,1] heatmap
+    (function(){
+      const bx=ox+cellW+gapX+22, by=oy+cellH+gapY;
+      const cw=27, ch=17;
+      const lo=Math.min(...allTemps), hi=Math.max(...allTemps);
+      svg.appendChild(el('text',{x:bx+cw*3.5,y:by-14,class:'chart-title','text-anchor':'middle'},'City × Day Heatmap'));
+      cities.forEach((c,i)=>{
+        svg.appendChild(el('text',{x:bx-6,y:by+ch*i+ch/2+3.5,class:'chart-tick','text-anchor':'end','font-size':'9px'},c.slice(0,3)));
+        days.forEach((_,j)=>{
+          const v=temps[i][j], t=(v-lo)/(hi-lo);
+          svg.appendChild(el('rect',{x:bx+cw*j,y:by+ch*i,width:cw-1,height:ch-1,fill:colorScale('YlOrRd',t)}));
+          svg.appendChild(el('text',{x:bx+cw*j+cw/2-0.5,y:by+ch*i+ch/2+3.5,'text-anchor':'middle',
+            'font-family':"'JetBrains Mono', monospace",'font-size':'8.5px',fill:(t>0.62||t<0.1)?'#fff':'#1a1a1a'},v));
+        });
+      });
+      days.forEach((d,j)=>svg.appendChild(el('text',{x:bx+cw*j+cw/2,y:by-3,class:'chart-tick','text-anchor':'middle','font-size':'9px'},d[0])));
+    })();
+  }
+
+  // ---------- workflow insights ----------
+  function renderInsights(){
+    const avg=temps.map(mean);
+    const stats=temps.map(boxStats);
+    const hottest=avg.indexOf(Math.max(...avg));
+    const iqrs=stats.map(s=>s.iqr);
+    const tightest=iqrs.indexOf(Math.min(...iqrs));
+    const oslo=avg[2];
+    const nextLowest=Math.min(...[0,1,3,4].map(i=>avg[i]));
+    document.getElementById('qa-1').innerText='The melt to long form in step 2. Every Seaborn call afterwards just names columns — "day", "temp", "city" — which only exist once the data is tidy.';
+    document.getElementById('qa-2').innerText=`${cities[hottest]} — mean ${avg[hottest].toFixed(2)}°C, the tallest box in the top-right panel.`;
+    document.getElementById('qa-3').innerText=`${cities[tightest]} — IQR of just ${iqrs[tightest].toFixed(2)}°C (Q1 ${stats[tightest].q1}, Q3 ${stats[tightest].q3}).`;
+    document.getElementById('qa-4').innerText=`Because the cities cluster at different levels. Oslo averages ${oslo.toFixed(2)}°C while the next-coldest city averages ${nextLowest.toFixed(2)}°C — a ${(nextLowest-oslo).toFixed(2)}°C gap with no readings in between, so the density drops to near zero there.`;
+    document.getElementById('qa-5').innerText='The heatmap. It is the one common Seaborn function that wants a rectangular matrix, so step 7 pivots the tidy frame back to wide form first.';
+    const rows=cities.map((c,i)=>{
+      const s=stats[i];
+      return [Math.min(...temps[i]), s.q1.toFixed(1), s.med.toFixed(1), s.q3.toFixed(1), Math.max(...temps[i]), s.iqr.toFixed(2)];
+    });
+    table('qa-6-table',rows,cities,['min','Q1','median','Q3','max','IQR']);
+  }
+
+  // ---------- quiz ----------
+  const quizFeedback={
+    qs1:{correct:'Correct — Seaborn aggregates, bootstraps intervals and reads column names, all from a tidy DataFrame.',wrong:'Not quite — rendering speed is Matplotlib\'s domain and Seaborn doesn\'t change it. What it adds is statistics and DataFrame awareness.'},
+    qs2:{correct:'Right — melting turns 5×7 = 35 values into 35 rows, each carrying its city, day and temperature.',wrong:'Not quite — transposing keeps it wide. Melting produces one row per individual reading: 35 rows, 3 columns.'},
+    qs3:{correct:'Right — with no hue, all 35 rows are one group, so Seaborn plots the mean per day with a bootstrapped confidence band.',wrong:'Not quite — without hue Seaborn has no way to know the rows belong to different cities, so it aggregates them into a single line.'},
+    qs4:{correct:'Right — a higher bandwidth widens each kernel, flattening local detail into a broader shape.',wrong:'Not quite — bw_adjust changes only the smoothing. The underlying 35 readings never change.'},
+    qs5:{correct:'Right — stripplot draws one point per row, so nothing is summarized away.',wrong:'Not quite — a barplot collapses each city\'s seven readings into a single mean, discarding the individual values.'},
+    qs6:{correct:'Right — temperature has a natural low-to-high order, which is exactly what a sequential palette encodes.',wrong:'Not quite — a qualitative palette implies no ordering, which would destroy the reader\'s ability to rank the cells.'},
+    qs7:{correct:'Right — relplot is figure-level, so it creates and owns the whole figure and can facet it.',wrong:'Not quite — lineplot is axes-level. It draws into a single Axes and has no authority to create a grid.'},
+    p1:{correct:'Right — Seaborn issues Matplotlib calls, which is why plt.savefig() and ax.set_ylim() still work on its output.',wrong:'Not quite — Seaborn depends on Matplotlib entirely. It\'s a convenience layer, not a competitor.'},
+    p2:{correct:'Right — that shape is what lets Seaborn address every variable by column name.',wrong:'Not quite — that\'s data cleanliness, which is a separate concern. Tidiness is about layout: one row per observation.'},
+    p3:{correct:'Right — 5 × 7 = 35 values, each becoming its own row alongside its city and day.',wrong:'Not quite — melting doesn\'t add dimensions together. Every individual cell becomes one row: 35 in total.'},
+    p4:{correct:'Right — pivot() spreads a column back out into column headers, undoing a melt.',wrong:'Not quite — melt() goes wide to long. pivot() is the reverse direction.'},
+    p5:{correct:'Right — hue maps a column to color, creating one series per unique value and building the legend.',wrong:'Not quite — color= sets one fixed color for everything. hue= is what splits by a column.'},
+    p6:{correct:'Right — a boxplot encodes the five-number summary plus any outliers in a single compact shape.',wrong:'Not quite — a barplot shows only the mean and an error bar, discarding the quartiles entirely.'},
+    p7:{correct:'Right — heatmap wants a rectangular matrix, which is why you pivot back to wide before calling it.',wrong:'Not quite — lineplot is firmly in the tidy/long camp, like almost everything else in the library.'},
+    p8:{correct:'Right — it\'s a bootstrapped 95% confidence interval around the mean, drawn by default.',wrong:'Not quite — the band is a confidence interval, not the full range. Pass errorbar=None to remove it.'},
+    p9:{correct:'Right — barplot aggregates with the mean by default; pass estimator= to change it.',wrong:'Not quite — the default estimator is the mean, not the sum. That surprises people whose bars look too short.'},
+    p10:{correct:'Right — density means area, which is why a KDE\'s y-values can legitimately exceed 1.',wrong:'Not quite — summing heights is meaningless for a continuous density. Only the integrated area equals 1.'},
+    p11:{correct:'Right — in wide form the cities are the index and the days are column headers, so none of those names resolve.',wrong:'Not quite — lineplot supports hue fine. The problem is that the wide frame has no columns by those names.'},
+    p12:{correct:'Right — col= and row= belong to figure-level functions. The boxplot equivalent is catplot(kind="box", col=...).',wrong:'Not quite — reusing a column for x and col is legal on figure-level functions. The issue is that boxplot is axes-level.'},
+    p13:{correct:'Right — figure-level functions return a FacetGrid, so you title through the grid, not through pyplot.',wrong:'Not quite — calling it earlier would title a different figure entirely. Use the returned FacetGrid object.'},
+    p14:{correct:'Right — hue is the parameter that maps a column to color.',wrong:'Not quite — legend= only toggles whether a legend is drawn; it doesn\'t create the color grouping.'},
+    p15:{correct:'Right — annot=True writes each cell\'s value, and fmt controls how it\'s formatted.',wrong:'Not quite — there is no label= parameter for this. The keyword is annot.'},
+    p16:{correct:'Right — col= creates one panel per value, and col_wrap controls how many before wrapping to a new row.',wrong:'Not quite — hue would put all five cities in a single panel as colors. col= is what makes separate panels.'},
+    p17:{correct:'Right — varying brightness reads as varying magnitude, which invents an ordering the data doesn\'t have.',wrong:'Not quite — Seaborn handles any number of colors. The problem is perceptual, not technical.'},
+    p18:{correct:'Right — a deviation has a meaningful zero point, which is exactly what a diverging palette\'s neutral center marks.',wrong:'Not quite — a sequential palette has no special midpoint, so "exactly average" wouldn\'t be visually distinguishable.'},
+    p19:{correct:'Right — with seven points, the curve\'s shape is largely the bandwidth assumption rather than observed structure.',wrong:'Not quite — it runs without complaint at any sample size. That\'s precisely why the misleading result is easy to miss.'},
+    p20:{correct:'Right — the box gives the summary, the dots prove what it was computed from. Especially valuable at small n.',wrong:'Not quite — a boxplot stands alone fine. The overlay is a deliberate honesty choice, not a requirement.'},
+  };
+  function answerQuiz(btn,ok,gid){
+    btn.closest('.quiz-opts').querySelectorAll('.quiz-opt').forEach(b=>b.disabled=true);
+    btn.classList.add(ok?'correct':'wrong');
+    const fb=document.getElementById(gid+'-feedback');
+    fb.classList.add('show');
+    const m=quizFeedback[gid];
+    fb.innerHTML=m?(ok?m.correct:m.wrong):(ok?'Correct!':'Not quite.');
+  }
+
+  // ---------- init ----------
+  miniChart('plain-chart-svg',false);
+  miniChart('themed-chart-svg',true);
+  renderWide('wide-table');
+  showShape('wide',null);
+  applyRel();
+  drawScatterSummary();
+  applyDist();
+  drawBoxAnatomy();
+  setCat('bar',null);
+  renderPalettes();
+  applyTheme();
+  applyHeat();
+  drawFacets();
+  drawWorkflow();
+  renderInsights();
+</script>
+
+</body>
+</html>
