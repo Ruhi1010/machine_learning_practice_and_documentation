@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matplotlib: The Complete Note | Ruhi Practice Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0b1020; --bg-alt: #11182d; --card: #151d36; --cell-bg: #10172b; --cell-border: #26345a; --border: #202b4a;
+    --text: #eef2ff; --text-dim: #a9b5d6; --text-faint: #6f7da3;
+    --accent: #8b5cf6; --accent-soft: rgba(139,92,246,.14);
+    --teal: #22d3ee; --teal-soft: rgba(34,211,238,.10);
+    --purple: #c084fc; --purple-soft: rgba(192,132,252,.10);
+    --red: #fb7185; --red-soft: rgba(251,113,133,.10);
+    --shadow: rgba(2,6,23,.65);
+  }
+  html[data-theme="light"]{
+    --bg: #f6f7ff; --bg-alt: #edf0ff; --card: #ffffff; --cell-bg: #f3f5ff; --cell-border: #d9def2; --border: #e1e5f5;
+    --text: #171b35; --text-dim: #59627f; --text-faint: #7b84a2;
+    --accent: #6d28d9; --accent-soft: rgba(109,40,217,.09);
+    --teal: #0891b2; --teal-soft: rgba(8,145,178,.08);
+    --purple: #9333ea; --purple-soft: rgba(147,51,234,.08);
+    --red: #e11d48; --red-soft: rgba(225,29,72,.08);
+    --shadow: rgba(50,60,100,.14);
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    background: var(--bg); color: var(--text);
+    font-family:'Manrope', sans-serif; line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    transition: background-color .35s ease, color .35s ease;
+  }
+  .mono{ font-family:'JetBrains Mono', monospace; }
+  ::selection{ background: var(--accent-soft); color: var(--accent); }
+
+  #progress-bar{
+    position: fixed; top:0; left:0; height:3px; width:0%;
+    background: linear-gradient(90deg, var(--accent), var(--teal));
+    z-index: 200; transition: width .1s ease-out;
+  }
+  #theme-toggle{
+    position: fixed; top: 18px; right: 20px; z-index: 150;
+    width: 42px; height: 42px; border-radius: 50%;
+    background: var(--card); border: 1px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; box-shadow: 0 8px 20px var(--shadow);
+    transition: transform .2s ease, border-color .2s ease;
+  }
+  #theme-toggle:hover{ border-color: var(--accent); transform: scale(1.06); }
+  #theme-toggle svg{ width:19px; height:19px; }
+  #back-to-top{
+    position: fixed; bottom: 24px; right: 20px; z-index: 150;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--accent); border:none; color:#14161b;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; box-shadow: 0 8px 20px var(--shadow);
+    opacity:0; pointer-events:none; transition: opacity .25s ease, transform .2s ease;
+  }
+  #back-to-top.show{ opacity:1; pointer-events:auto; }
+  #back-to-top:hover{ transform: translateY(-3px); }
+
+  .wrap{ max-width: 900px; margin:0 auto; padding: 0 24px; }
+  section{ padding: 100px 0; }
+
+  #hero{ padding-top: 130px; text-align:center; }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace; font-size:13px; letter-spacing:.14em;
+    text-transform:uppercase; color: var(--accent); margin-bottom:20px;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+  }
+  .eyebrow::before, .eyebrow::after{ content:""; width:26px; height:1px; background: var(--accent); opacity:.5; }
+  h1.hero-title{ font-size: clamp(36px, 6vw, 56px); font-weight:800; letter-spacing:-.02em; line-height:1.1; margin-bottom:22px; }
+  .hero-title .hl{ color: var(--accent); }
+  .hero-sub{ font-size:18px; color: var(--text-dim); max-width:600px; margin:0 auto 40px; }
+  .hero-stats{ display:flex; justify-content:center; gap: 36px; flex-wrap:wrap; }
+  .hero-stat .num{ font-family:'JetBrains Mono', monospace; font-size:24px; font-weight:700; color:var(--teal); }
+  .hero-stat .lbl{ font-size:12.5px; color: var(--text-faint); text-transform:uppercase; letter-spacing:.06em; }
+
+  #toc .hero-sub{ margin-bottom: 46px; }
+  .toc-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:14px; }
+  .toc-card{
+    background: var(--card); border:1px solid var(--border); border-radius:14px;
+    padding: 20px 20px 18px; text-decoration:none; color:var(--text);
+    display:flex; flex-direction:column; gap:8px;
+    transition: border-color .2s ease, transform .2s ease; position: relative;
+  }
+  .toc-card.ready:hover{ border-color: var(--accent); transform: translateY(-3px); }
+  .toc-card.locked{ opacity:.5; }
+  .toc-num{ font-family:'JetBrains Mono', monospace; font-size:12px; color: var(--text-faint); }
+  .toc-title{ font-size:14.5px; font-weight:700; }
+  .toc-desc{ font-size:12.5px; color: var(--text-dim); }
+  .toc-pill{ position:absolute; top:16px; right:16px; font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.04em; padding:3px 9px; border-radius:999px; text-transform:uppercase; }
+  .toc-pill.ready{ background: var(--teal-soft); color: var(--teal); }
+  .toc-pill.soon{ background: var(--border); color: var(--text-faint); }
+
+  .chapter{ border-top:1px solid var(--border); scroll-margin-top: 30px; }
+  .ch-meta{ display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+  .ch-eyebrow{ font-family:'JetBrains Mono', monospace; font-size:12px; letter-spacing:.1em; text-transform:uppercase; color: var(--accent); }
+  .ch-badge{ font-family:'JetBrains Mono', monospace; font-size:11px; color: var(--text-faint); border:1px solid var(--border); padding:3px 10px; border-radius:999px; }
+  h2.ch-title{ font-size: clamp(28px, 4vw, 38px); font-weight:800; letter-spacing:-.01em; margin-bottom:18px; }
+  .step-label{ font-family:'JetBrains Mono', monospace; font-size:11.5px; letter-spacing:.08em; text-transform:uppercase; color: var(--text-faint); margin: 40px 0 12px; display:flex; align-items:center; gap:10px; }
+  .step-label::before{ content:""; width:14px; height:1px; background: var(--text-faint); }
+  p.body-text{ color: var(--text-dim); font-size:16px; max-width: 660px; margin-bottom:16px; }
+  strong.emph{ color: var(--text); }
+
+  .info-card{ border-radius:12px; padding:20px 22px; margin: 18px 0; border-left:3px solid; font-size:14.5px; }
+  .info-card .info-label{ font-family:'JetBrains Mono', monospace; font-size:11.5px; letter-spacing:.06em; text-transform:uppercase; margin-bottom:8px; display:block; font-weight:700; }
+  .info-card p{ color: var(--text-dim); }
+  .info-card.remember{ background: var(--teal-soft); border-color: var(--teal); }
+  .info-card.remember .info-label{ color: var(--teal); }
+  .info-card.mistake{ background: var(--red-soft); border-color: var(--red); }
+  .info-card.mistake .info-label{ color: var(--red); }
+  .info-card.insight{ background: var(--accent-soft); border-color: var(--accent); }
+  .info-card.insight .info-label{ color: var(--accent); }
+  .info-card.tip{ background: var(--purple-soft); border-color: var(--purple); }
+  .info-card.tip .info-label{ color: var(--purple); }
+  .info-card.usecase{ background: var(--teal-soft); border-color: var(--teal); }
+  .info-card.usecase .info-label{ color: var(--teal); }
+
+  .code-block{ background: var(--cell-bg); border:1px solid var(--cell-border); border-radius:12px; overflow:hidden; margin: 18px 0; }
+  .code-head{ display:flex; align-items:center; justify-content:space-between; padding:10px 16px; background: var(--bg-alt); border-bottom:1px solid var(--cell-border); }
+  .code-head .left{ display:flex; align-items:center; gap:10px; }
+  .code-dots{ display:flex; gap:6px; }
+  .code-dots span{ width:8px; height:8px; border-radius:50%; background: var(--border); }
+  .code-lang{ font-family:'JetBrains Mono', monospace; font-size:11px; color: var(--text-faint); }
+  .code-actions{ display:flex; gap:8px; }
+  .code-btn{ font-family:'JetBrains Mono', monospace; font-size:11px; color: var(--text-dim); background:transparent; border:1px solid var(--border); border-radius:7px; padding:5px 11px; cursor:pointer; transition: all .15s ease; }
+  .code-btn:hover{ border-color: var(--accent); color: var(--accent); }
+  .code-btn.run-btn{ color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+  pre.code-body{ padding:18px 20px; font-family:'JetBrains Mono', monospace; font-size:13.5px; overflow-x:auto; white-space:pre; }
+  .kw{ color: var(--purple); } .str{ color: var(--teal); } .fn{ color:#7fb4ff; } .cmt{ color: var(--text-faint); }
+  html[data-theme="light"] .fn{ color:#2563b0; }
+  .code-output{ display:none; border-top:1px solid var(--cell-border); }
+  .code-output.show{ display:block; animation: fadeIn .3s ease; }
+  .code-output .out-label{ padding:8px 20px 0; font-family:'JetBrains Mono', monospace; font-size:10.5px; color: var(--text-faint); text-transform:uppercase; letter-spacing:.06em; }
+  .code-output pre{ padding:8px 20px 16px; font-family:'JetBrains Mono', monospace; font-size:13.5px; color: var(--text-dim); white-space:pre; }
+  @keyframes fadeIn{ from{opacity:0;} to{opacity:1;} }
+
+  /* ---------- Jupyter-style DataFrame table ---------- */
+  .df-wrap{ overflow-x:auto; border-radius:12px; border:1px solid var(--cell-border); margin: 16px 0; }
+  .df-table{ border-collapse:collapse; width:100%; font-family:'JetBrains Mono', monospace; font-size:12.5px; }
+  .df-table thead th{ background: var(--bg-alt); color: var(--text-dim); padding:10px 16px; border-bottom:2px solid var(--cell-border); font-weight:600; white-space:nowrap; }
+  .df-table th.df-index-h{ background: var(--bg-alt); }
+  .df-table td{ padding:9px 16px; border-bottom:1px solid var(--cell-border); color: var(--text); white-space:nowrap; }
+  .df-table td.df-index{ color: var(--text-faint); font-weight:600; background: var(--bg-alt); }
+  .df-table tbody tr:hover td{ background: var(--accent-soft); }
+  .df-table td.df-nan{ color: var(--red); font-style:italic; }
+  .df-table .anatomy-highlight{ background: var(--accent-soft) !important; outline:2px solid var(--accent); outline-offset:-2px; }
+  .df-caption{ font-size:12px; color: var(--text-faint); margin-top:-8px; margin-bottom:16px; }
+
+  .task-list{ list-style:none; padding:0; margin:14px 0; }
+  .task-list li{ padding:9px 0 9px 26px; position:relative; color: var(--text-dim); font-size:14px; border-bottom:1px solid var(--border); }
+  .task-list li:last-child{ border-bottom:none; }
+  .task-list li::before{ content:"\2192"; position:absolute; left:0; color: var(--accent); font-family:'JetBrains Mono', monospace; }
+
+  /* ---------- tabs / toggle buttons ---------- */
+  .tabs{ display:flex; gap:8px; margin: 16px 0; flex-wrap:wrap; }
+  .tab-btn{ font-family:'JetBrains Mono', monospace; font-size:12.5px; background:transparent; border:1px solid var(--border); color:var(--text-dim); padding:8px 16px; border-radius:999px; cursor:pointer; transition: all .15s ease; }
+  .tab-btn:hover{ border-color: var(--accent); color: var(--text); }
+  .tab-btn.active{ background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+  /* ---------- playground ---------- */
+  .playground{ background: var(--card); border:1px solid var(--border); border-radius:16px; padding:26px 26px 24px; margin: 22px 0; }
+  .pg-controls{ display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; margin-bottom:6px; }
+  .pg-field{ display:flex; flex-direction:column; }
+  .pg-field label{ font-family:'JetBrains Mono', monospace; font-size:10.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:7px; }
+  .pg-field select, .pg-field input{ background: var(--bg-alt); border:1px solid var(--border); color: var(--text); padding:9px 12px; border-radius:8px; font-family:'JetBrains Mono', monospace; font-size:13px; width:150px; }
+
+  /* ---------- comparison table ---------- */
+  .dim-table{ width:100%; border-collapse:collapse; margin:20px 0; font-size:13.5px; }
+  .dim-table th, .dim-table td{ text-align:left; padding:10px 14px; border-bottom:1px solid var(--border); }
+  .dim-table th{ color: var(--text-faint); font-family:'JetBrains Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:.05em; font-weight:600; }
+  .dim-table td.dim-name{ color: var(--teal); font-family:'JetBrains Mono', monospace; font-weight:600; }
+
+  /* ---------- architecture diagram ---------- */
+  .diagram-shell{ background: var(--card); border:1px solid var(--border); border-radius: 20px; padding: 44px 30px; margin: 24px 0; overflow:hidden; }
+  .eco-svg{ width:100%; height:auto; display:block; }
+  .eco-node rect{ fill: var(--cell-bg); stroke: var(--cell-border); stroke-width:1.5; transition: stroke .3s ease; }
+  .eco-node text{ fill: var(--text); font-family:'JetBrains Mono', monospace; }
+  .eco-node.visible rect{ stroke: var(--accent); }
+  .eco-node{ opacity:0; transform: translateY(14px); transition: opacity .6s ease, transform .6s ease; }
+  .eco-node.visible{ opacity:1; transform: translateY(0); }
+  .eco-path.flow{ stroke: var(--accent); stroke-width:2; fill:none; stroke-dasharray: 300; stroke-dashoffset: 300; transition: stroke-dashoffset 1.2s ease; }
+  .eco-path.flow.visible{ stroke-dashoffset: 0; }
+
+  /* ---------- quiz ---------- */
+  .quiz-block{ background: var(--card); border:1px solid var(--border); border-radius:14px; padding:26px 26px 24px; margin: 30px 0; }
+  .quiz-q{ font-weight:700; font-size:15.5px; margin-bottom:16px; }
+  .quiz-opts{ display:flex; flex-direction:column; gap:9px; }
+  .quiz-opt{ text-align:left; background: var(--bg-alt); border:1px solid var(--border); color: var(--text); padding:12px 16px; border-radius:9px; font-size:14px; cursor:pointer; font-family:'Manrope', sans-serif; transition: all .15s ease; }
+  .quiz-opt:hover{ border-color: var(--accent); }
+  .quiz-opt.correct{ border-color: var(--teal); background: var(--teal-soft); color: var(--teal); }
+  .quiz-opt.wrong{ border-color: var(--red); background: var(--red-soft); color: var(--red); }
+  .quiz-feedback{ margin-top:14px; font-size:13.5px; color: var(--text-dim); display:none; }
+  .quiz-feedback.show{ display:block; animation: fadeIn .3s ease; }
+
+  .prop-grid{ display:flex; flex-wrap:wrap; gap:10px; margin: 16px 0; }
+  .prop-chip{ font-family:'JetBrains Mono', monospace; font-size:12.5px; background: var(--cell-bg); border:1px solid var(--cell-border); border-radius:9px; padding:9px 14px; color: var(--text-dim); }
+  .prop-chip b{ color: var(--teal); }
+
+  @keyframes rowEnter{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
+
+  /* ---------- split-apply-combine visual (section 7) ---------- */
+  .sac-flow{ display:flex; align-items:center; gap:20px; flex-wrap:wrap; margin:20px 0; padding:24px; background: var(--card); border:1px solid var(--border); border-radius:14px; }
+  .sac-stage{ text-align:center; flex:1; min-width:110px; }
+  .sac-icon{ font-size:26px; margin-bottom:8px; }
+  .sac-label{ font-family:'JetBrains Mono', monospace; font-size:13px; font-weight:700; color: var(--text); }
+  .sac-sub{ font-size:11.5px; color: var(--text-faint); margin-top:2px; }
+  .sac-arrow{ font-size:20px; color: var(--text-faint); }
+  .sac-stage.pulse{ animation: sacPulse .5s ease; }
+  @keyframes sacPulse{ 0%{ transform:scale(1); } 50%{ transform:scale(1.05); box-shadow:0 0 0 4px var(--accent-soft); border-radius:12px; } 100%{ transform:scale(1); } }
+
+  .quiz-tag{ font-family:'JetBrains Mono', monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color: var(--accent); background: var(--accent-soft); padding:3px 10px; border-radius:999px; display:inline-block; margin-bottom:10px; }
+  .quiz-code{ background: var(--bg-alt); border:1px solid var(--border); border-radius:8px; padding:12px 14px; font-family:'JetBrains Mono', monospace; font-size:13px; margin:10px 0 16px; white-space:pre; overflow-x:auto; color: var(--text-dim); }
+
+  .insight-qa{ display:flex; flex-direction:column; gap:12px; margin:20px 0; }
+  .qa-item{ background: var(--card); border:1px solid var(--border); border-radius:12px; padding:16px 20px; }
+  .qa-q{ font-size:14px; color: var(--text-dim); margin-bottom:8px; }
+  .qa-a{ font-family:'JetBrains Mono', monospace; font-size:14.5px; color: var(--teal); font-weight:600; }
+
+  .roadmap-flow{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:26px 0; }
+  .roadmap-step{ font-family:'JetBrains Mono', monospace; font-size:12px; background: var(--card); border:1px solid var(--border); padding:8px 14px; border-radius:999px; color: var(--text-dim); }
+  .roadmap-arrow{ color: var(--text-faint); font-size:13px; }
+  .roadmap-step.final{ background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight:700; }
+  .pull-quote{ font-size: clamp(20px, 3vw, 26px); font-weight:700; line-height:1.4; color: var(--text); border-left:3px solid var(--accent); padding-left:22px; margin: 30px 0; }
+
+  footer{ text-align:center; padding: 50px 24px 70px; color: var(--text-faint); font-family:'JetBrains Mono', monospace; font-size:12px; border-top:1px solid var(--border); }
+
+  @media (max-width: 760px){
+    .toc-grid{ grid-template-columns: 1fr; }
+    section{ padding: 64px 0; }
+    #hero{ padding-top: 100px; }
+  }
+
+  /* ---------- chart canvas ---------- */
+  .chart-shell{ background: var(--card); border:1px solid var(--border); border-radius:16px; padding:20px 22px 16px; margin: 18px 0; }
+  .chart-svg{ width:100%; height:auto; display:block; }
+  .chart-axis{ stroke: var(--text-faint); stroke-width:1.5; }
+  .chart-grid{ stroke: var(--border); stroke-width:1; }
+  .chart-tick{ fill: var(--text-faint); font-family:'JetBrains Mono', monospace; font-size:10.5px; }
+  .chart-title{ fill: var(--text); font-family:'Manrope', sans-serif; font-size:14px; font-weight:700; }
+  .chart-label{ fill: var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:11px; }
+  .legend-row{ display:flex; flex-wrap:wrap; gap:14px; margin-top:10px; padding-top:10px; border-top:1px solid var(--border); }
+  .legend-item{ display:flex; align-items:center; gap:7px; font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-dim); }
+  .legend-swatch{ width:14px; height:3px; border-radius:2px; display:inline-block; }
+  .legend-dot{ width:9px; height:9px; border-radius:50%; display:inline-block; }
+  .anatomy-part{ cursor:pointer; transition: opacity .2s ease; }
+  .anatomy-part.dim{ opacity:.28; }
+  .anatomy-part.hl rect, .anatomy-part.hl path, .anatomy-part.hl line{ stroke: var(--accent) !important; stroke-width:2.5 !important; }
+  .anatomy-part.hl text{ fill: var(--accent) !important; }
+  .pg-field select[multiple]{ height:auto; }
+  .color-swatch-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .color-swatch{ width:26px; height:26px; border-radius:8px; cursor:pointer; border:2px solid transparent; }
+  .color-swatch.active{ border-color: var(--text); }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+  <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></svg>
+</button>
+<button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+<section id="hero">
+  <div class="wrap">
+    <div class="eyebrow">✦ Ruhi Practice Hub ✦</div>
+    <h1 class="hero-title">Matplotlib — turning arrays<br>into <span class="hl">pictures</span></h1>
+    <p class="hero-sub">Third in the series, after NumPy and Pandas. Same running dataset — a week of temperatures across five cities — finally drawn, not just computed.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">7</div><div class="lbl">Core Sections</div></div>
+      <div class="hero-stat"><div class="num">1</div><div class="lbl">Dataset, Start to Finish</div></div>
+      <div class="hero-stat"><div class="num">20+</div><div class="lbl">Practice Questions</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="toc">
+  <div class="wrap">
+    <h2 class="ch-title" style="text-align:center;">7 sections, one continuous figure</h2>
+    <div class="toc-grid">
+      <a href="#s1" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">01</span><span class="toc-title">Why Do We Need Matplotlib?</span><span class="toc-desc">From arrays of numbers to something you can actually read.</span></a>
+      <a href="#s2" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">02</span><span class="toc-title">Anatomy of a Plot</span><span class="toc-desc">Figure, Axes, and everything living inside them.</span></a>
+      <a href="#s3" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">03</span><span class="toc-title">Line &amp; Scatter Plots</span><span class="toc-desc">plot() vs scatter(), and when to use which.</span></a>
+      <a href="#s4" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">04</span><span class="toc-title">Bar Charts &amp; Histograms</span><span class="toc-desc">Comparing categories vs. showing a distribution.</span></a>
+      <a href="#s5" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">05</span><span class="toc-title">Subplots</span><span class="toc-desc">Multiple small charts, one figure, one grid.</span></a>
+      <a href="#s6" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">06</span><span class="toc-title">Styling &amp; Annotation</span><span class="toc-desc">Colors, markers, legends, labeling a specific point.</span></a>
+      <a href="#s7" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">07</span><span class="toc-title">Multi-Series &amp; Saving</span><span class="toc-desc">Comparing every city at once, then exporting it.</span></a>
+      <a href="#workflow" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">＋</span><span class="toc-title">Real-World Workflow</span><span class="toc-desc">The full case study, start to finish.</span></a>
+      <a href="#practice" class="toc-card ready"><span class="toc-pill ready">Ready</span><span class="toc-num">＋</span><span class="toc-title">Practice Questions</span><span class="toc-desc">20+ questions with instant feedback.</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" id="s1">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Section 01</span><span class="ch-badge">Foundations</span></div>
+    <h2 class="ch-title">Why Do We Need Matplotlib?</h2>
+
+    <div class="step-label">The problem</div>
+    <p class="body-text">By now Tokyo's week lives in a NumPy array. Here it is, printed the only way arrays know how to present themselves:</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button></div></div>
+      <pre class="code-body"><span class="kw">print</span>(tokyo_week)</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>[18 19 21 20 22 23 21]</pre></div>
+    </div>
+    <p class="body-text">Technically correct. Completely unreadable at a glance — is it trending up? Is Thursday an outlier? A human eye answers that instantly from a picture and never from a row of digits.</p>
+    <ul class="task-list" style="margin-bottom:20px;">
+      <li>Trends over time are invisible in a list of numbers, obvious in a line.</li>
+      <li>Comparing categories (five cities) means mentally re-scanning columns, every time.</li>
+      <li>Outliers and spread don't jump out of text — they jump out of a shape.</li>
+      <li>Nobody you explain results to wants to read an array. They want a chart.</li>
+    </ul>
+    <p class="body-text">The exact same array, plotted:</p>
+    <div class="chart-shell">
+      <svg class="chart-svg" viewBox="0 0 640 280" xmlns="http://www.w3.org/2000/svg" id="hero-chart-svg"></svg>
+    </div>
+
+    <div class="info-card insight">
+      <span class="info-label">Data Science Insight</span>
+      <p>Matplotlib is the foundation plotting library for Python — nearly every other plotting tool (Pandas' <span class="mono">.plot()</span>, Seaborn) is either built on it or designed to interoperate with it.</p>
+    </div>
+
+    <div class="step-label">Where Matplotlib sits</div>
+    <div class="diagram-shell">
+      <svg class="eco-svg" viewBox="0 0 780 260" xmlns="http://www.w3.org/2000/svg">
+        <path class="eco-path flow" d="M 140 55 L 140 105" />
+        <path class="eco-path flow" d="M 140 105 L 390 105 L 390 155" />
+        <path class="eco-path flow" d="M 640 105 L 390 105" />
+        <path class="eco-path flow" d="M 390 205 L 390 155" />
+        <g class="eco-node" data-n="1"><rect x="70" y="18" width="140" height="40" rx="10"/><text x="140" y="43" font-size="13.5" text-anchor="middle" font-weight="600">NumPy</text></g>
+        <g class="eco-node" data-n="2"><rect x="70" y="68" width="140" height="40" rx="10"/><text x="140" y="93" font-size="13.5" text-anchor="middle" font-weight="600">Pandas</text></g>
+        <g class="eco-node" data-n="3"><rect x="320" y="118" width="140" height="40" rx="10"/><text x="390" y="143" font-size="13.5" text-anchor="middle" font-weight="600">Matplotlib</text></g>
+        <g class="eco-node" data-n="4"><rect x="570" y="68" width="140" height="40" rx="10"/><text x="640" y="93" font-size="12.5" text-anchor="middle" font-weight="600">Seaborn &amp; more</text></g>
+        <g class="eco-node" data-n="5"><rect x="320" y="205" width="140" height="40" rx="10"/><text x="390" y="230" font-size="12.5" text-anchor="middle" font-weight="600">Figures &amp; Reports</text></g>
+      </svg>
+    </div>
+
+    <div class="step-label">Installing &amp; importing</div>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">terminal</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button></div></div>
+      <pre class="code-body">pip install matplotlib</pre>
+    </div>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body"><span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">import</span> numpy <span class="kw">as</span> np</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>(no output — plt is now ready to use)</pre></div>
+    </div>
+    <p class="body-text"><span class="mono">plt</span> is the universal convention, exactly like <span class="mono">np</span> and <span class="mono">pd</span> before it.</p>
+
+    <div class="info-card mistake">
+      <span class="info-label">Common Mistake</span>
+      <p>Forgetting <span class="mono">plt.show()</span> in a plain <span class="mono">.py</span> script — the figure is built in memory but never actually displayed. Notebooks are more forgiving and often show the last figure automatically, which hides this habit until it breaks elsewhere.</p>
+    </div>
+
+    <div class="step-label">Practice challenge</div>
+    <div class="quiz-block">
+      <div class="quiz-q">Quick check: what's the core problem Matplotlib solves?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'qs1')">It makes NumPy arrays calculate faster</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'qs1')">It turns arrays of numbers into readable visual shapes</button>
+      </div>
+      <div class="quiz-feedback" id="qs1-feedback"></div>
+    </div>
+
+    <div class="step-label">Summary</div>
+    <p class="body-text">You now know why plotting matters and how to import Matplotlib. Next: what a "plot" is actually made of, piece by piece.</p>
+  </div>
+</section>
+
+<section class="chapter" id="s2">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Section 02</span><span class="ch-badge">Interactive anatomy</span></div>
+    <h2 class="ch-title">Anatomy of a Plot</h2>
+
+    <div class="step-label">Figure vs Axes</div>
+    <p class="body-text">Two objects run every Matplotlib chart. A <strong class="emph">Figure</strong> is the whole canvas — the window or the saved image file. An <strong class="emph">Axes</strong> is one actual plot living inside it — its own x-axis, y-axis, title, and data. One Figure can hold many Axes.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body">fig, ax = plt.subplots(figsize=(<span class="str">6</span>, <span class="str">4</span>))
+ax.plot(days, tokyo_week)
+ax.set_title(<span class="str">"Tokyo — 7 Day Forecast"</span>)
+ax.set_xlabel(<span class="str">"Day"</span>)
+ax.set_ylabel(<span class="str">"Temperature (\u00b0C)"</span>)
+plt.show()</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>(displays the figure — one Axes, one line, a title and two axis labels)</pre></div>
+    </div>
+
+    <div class="info-card tip">
+      <span class="info-label">Pro Tip</span>
+      <p><span class="mono">fig, ax = plt.subplots()</span> is the recommended starting line for almost every plot, even a single one — it gives you an explicit <span class="mono">ax</span> to call methods on, instead of relying on Matplotlib's implicit "current axes."</p>
+    </div>
+
+    <div class="step-label">Click each part — interactive</div>
+    <p class="body-text">Every one of these is a real, individually addressable object.</p>
+    <div class="playground">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="showPlotAnatomy('figure', this)">Figure</button>
+        <button class="tab-btn" onclick="showPlotAnatomy('axes', this)">Axes</button>
+        <button class="tab-btn" onclick="showPlotAnatomy('title', this)">Title</button>
+        <button class="tab-btn" onclick="showPlotAnatomy('xlabel', this)">X-axis &amp; label</button>
+        <button class="tab-btn" onclick="showPlotAnatomy('ylabel', this)">Y-axis &amp; label</button>
+        <button class="tab-btn" onclick="showPlotAnatomy('line', this)">The line itself</button>
+        <button class="tab-btn" onclick="showPlotAnatomy('legend', this)">Legend</button>
+      </div>
+      <div class="chart-shell" style="margin-top:14px;">
+        <svg class="chart-svg" viewBox="0 0 640 320" xmlns="http://www.w3.org/2000/svg" id="anatomy-chart-svg"></svg>
+      </div>
+      <p class="body-text" id="anatomy-chart-desc" style="margin-top:10px; margin-bottom:0;"></p>
+    </div>
+
+    <div class="info-card mistake">
+      <span class="info-label">Common Mistake</span>
+      <p>Mixing <span class="mono">plt.title()</span> (the pyplot shortcut) with <span class="mono">ax.set_title()</span> (the object-oriented call) inconsistently across a script with multiple subplots. Once you have more than one Axes, <span class="mono">plt.title()</span> only ever affects whichever one is "current" — often not the one you meant.</p>
+    </div>
+
+    <div class="step-label">Practice challenge</div>
+    <div class="quiz-block">
+      <div class="quiz-q">One Figure can contain...</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'qs2')">Exactly one Axes, always</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'qs2')">One or many Axes, arranged however you like</button>
+      </div>
+      <div class="quiz-feedback" id="qs2-feedback"></div>
+    </div>
+
+    <div class="step-label">Summary</div>
+    <p class="body-text">You now know the Figure/Axes relationship and can name every piece of a plot. Next: the two most common chart types for this kind of data.</p>
+  </div>
+</section>
+
+<section class="chapter" id="s3">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Section 03</span><span class="ch-badge">Live plotter</span></div>
+    <h2 class="ch-title">Line &amp; Scatter Plots</h2>
+
+    <div class="step-label">Line plots — for trends</div>
+    <p class="body-text"><span class="mono">ax.plot()</span> connects points in order — the right choice whenever order matters, like a week of days.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body">fig, ax = plt.subplots()
+ax.plot(days, temps[<span class="str">1</span>], marker=<span class="str">"o"</span>)   <span class="cmt"># Cairo's week</span>
+plt.show()</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>(a rising-and-falling line, one marker per day, for Cairo)</pre></div>
+    </div>
+
+    <div class="step-label">Scatter plots — for relationships</div>
+    <p class="body-text"><span class="mono">ax.scatter()</span> places unconnected points — the right choice when you're asking whether two variables relate, not tracking an order.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body">city_avg = temps.mean(axis=<span class="str">1</span>)
+city_std = temps.std(axis=<span class="str">1</span>)
+fig, ax = plt.subplots()
+ax.scatter(city_avg, city_std)   <span class="cmt"># average vs. day-to-day swing</span>
+plt.show()</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>(5 unconnected points — one per city, average temp vs. volatility)</pre></div>
+    </div>
+
+    <div class="step-label">Line vs Scatter — interactive</div>
+    <p class="body-text">Pick a city and a chart type. Same data, two different stories.</p>
+    <div class="playground">
+      <div class="pg-controls">
+        <div class="pg-field"><label>City</label>
+          <select id="ls-city" onchange="applyLineScatter()">
+            <option value="0">Tokyo</option>
+            <option value="1" selected>Cairo</option>
+            <option value="2">Oslo</option>
+            <option value="3">Lima</option>
+            <option value="4">Nairobi</option>
+          </select>
+        </div>
+        <div class="pg-field"><label>Chart type</label>
+          <select id="ls-type" onchange="applyLineScatter()">
+            <option value="line">Line — ax.plot()</option>
+            <option value="scatter">Scatter — ax.scatter()</option>
+          </select>
+        </div>
+      </div>
+      <div class="code-block" style="margin-top:6px;"><pre class="code-body" id="ls-code" style="padding:12px 16px; font-size:13px;"></pre></div>
+      <div class="chart-shell">
+        <svg class="chart-svg" viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" id="ls-chart-svg"></svg>
+      </div>
+    </div>
+
+    <table class="dim-table">
+      <tr><th>Question</th><th>Use</th></tr>
+      <tr><td class="dim-name">Does order/sequence matter?</td><td>Line plot</td></tr>
+      <tr><td class="dim-name">Are you comparing two independent measurements?</td><td>Scatter plot</td></tr>
+      <tr><td class="dim-name">Is this a trend over time?</td><td>Line plot</td></tr>
+      <tr><td class="dim-name">Looking for clusters or correlation?</td><td>Scatter plot</td></tr>
+    </table>
+
+    <div class="info-card mistake">
+      <span class="info-label">Common Mistake</span>
+      <p>Using a line plot to connect points that have no real order — like connecting five unrelated cities in whatever order they happen to sit in an array. The connecting line implies a relationship between neighbors that doesn't exist. A scatter plot has no such implication.</p>
+    </div>
+
+    <div class="step-label">Practice challenge</div>
+    <div class="quiz-block">
+      <div class="quiz-q">You want to check whether cities with a higher average temperature also swing more day-to-day. Which chart?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'qs3')">Line plot, connecting the five cities in order</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'qs3')">Scatter plot — average on one axis, std on the other</button>
+      </div>
+      <div class="quiz-feedback" id="qs3-feedback"></div>
+    </div>
+
+    <div class="step-label">Summary</div>
+    <p class="body-text">You can now choose between a line and a scatter plot with a reason, not a guess. Next: comparing categories and looking at a distribution.</p>
+  </div>
+</section>
+
+<section class="chapter" id="s4">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Section 04</span><span class="ch-badge">Live plotter</span></div>
+    <h2 class="ch-title">Bar Charts &amp; Histograms</h2>
+
+    <div class="step-label">Bar charts — comparing categories</div>
+    <p class="body-text"><span class="mono">ax.bar()</span> compares a value across distinct categories — here, average temperature per city.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body">fig, ax = plt.subplots()
+ax.bar(cities, temps.mean(axis=<span class="str">1</span>))
+ax.set_ylabel(<span class="str">"Average Temp (\u00b0C)"</span>)
+plt.show()</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>(5 bars, Cairo tallest, Oslo shortest)</pre></div>
+    </div>
+    <div class="chart-shell">
+      <svg class="chart-svg" viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" id="bar-chart-svg"></svg>
+    </div>
+
+    <div class="step-label">Histograms — showing a distribution</div>
+    <p class="body-text">A histogram is not a bar chart of categories — it bins a single continuous variable and counts how many values fall in each bin. Here, every one of the 35 temperature readings, regardless of city or day.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body">fig, ax = plt.subplots()
+ax.hist(temps.flatten(), bins=<span class="str">7</span>)
+ax.set_xlabel(<span class="str">"Temperature (\u00b0C)"</span>)
+ax.set_ylabel(<span class="str">"Count"</span>)
+plt.show()</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>(a lumpy distribution — two visible clusters, since Oslo and Cairo sit far apart)</pre></div>
+    </div>
+
+    <div class="step-label">Histogram bin explorer — interactive</div>
+    <p class="body-text">All 35 readings, rebinned live. Fewer bins smooth things out; more bins reveal — or fabricate — structure.</p>
+    <div class="playground">
+      <div class="pg-controls">
+        <div class="pg-field"><label>Bins</label><input type="number" id="hist-bins" value="7" min="2" max="15" oninput="applyHist()"></div>
+      </div>
+      <div class="chart-shell">
+        <svg class="chart-svg" viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" id="hist-chart-svg"></svg>
+      </div>
+    </div>
+
+    <table class="dim-table">
+      <tr><th>Feature</th><th>Bar Chart</th><th>Histogram</th></tr>
+      <tr><td class="dim-name">X-axis</td><td>Discrete categories (cities)</td><td>Continuous value, binned into ranges</td></tr>
+      <tr><td class="dim-name">Bars touch?</td><td>No — categories are separate</td><td>Yes — bins are adjacent ranges</td></tr>
+      <tr><td class="dim-name">Answers</td><td>"How does A compare to B?"</td><td>"What does the spread of this variable look like?"</td></tr>
+    </table>
+
+    <div class="info-card mistake">
+      <span class="info-label">Common Mistake</span>
+      <p>Treating a bar chart and a histogram as interchangeable. Feeding five city averages into <span class="mono">ax.hist()</span> — or 35 individual readings into <span class="mono">ax.bar()</span> — produces something technically renders but answers the wrong question.</p>
+    </div>
+
+    <div class="step-label">Practice challenge</div>
+    <div class="quiz-block">
+      <div class="quiz-q">Which tool shows the spread of all 35 temperature readings at once?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'qs4')">ax.bar(cities, values) — one bar per city</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'qs4')">ax.hist(temps.flatten(), bins=n)</button>
+      </div>
+      <div class="quiz-feedback" id="qs4-feedback"></div>
+    </div>
+
+    <div class="step-label">Summary</div>
+    <p class="body-text">You can now compare categories and inspect a distribution. Next: putting several charts in one figure.</p>
+  </div>
+</section>
+
+<section class="chapter" id="s5">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Section 05</span><span class="ch-badge">Live grid</span></div>
+    <h2 class="ch-title">Subplots</h2>
+
+    <div class="step-label">One figure, many axes</div>
+    <p class="body-text"><span class="mono">plt.subplots(rows, cols)</span> returns a grid of Axes at once — <span class="mono">ax</span> becomes a 2-D array you index into, one cell per chart.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body">fig, axes = plt.subplots(<span class="str">2</span>, <span class="str">3</span>, figsize=(<span class="str">10</span>, <span class="str">6</span>))
+<span class="kw">for</span> i, city <span class="kw">in</span> <span class="fn">enumerate</span>(cities):
+    row, col = i // <span class="str">3</span>, i % <span class="str">3</span>
+    axes[row, col].plot(days, temps[i])
+    axes[row, col].set_title(city)
+fig.tight_layout()
+plt.show()</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>(2x3 grid — 5 small line charts, one empty cell)</pre></div>
+    </div>
+
+    <div class="step-label">Grid builder — interactive</div>
+    <p class="body-text">Choose a grid size and watch each city fill in, one Axes at a time, left to right, top to bottom.</p>
+    <div class="playground">
+      <div class="pg-controls">
+        <div class="pg-field"><label>Rows</label><input type="number" id="sub-rows" value="2" min="1" max="3" oninput="applySubplots()"></div>
+        <div class="pg-field"><label>Cols</label><input type="number" id="sub-cols" value="3" min="1" max="3" oninput="applySubplots()"></div>
+      </div>
+      <div class="code-block" style="margin-top:6px;"><pre class="code-body" id="sub-code" style="padding:12px 16px; font-size:13px;"></pre></div>
+      <div class="chart-shell">
+        <svg class="chart-svg" viewBox="0 0 640 360" xmlns="http://www.w3.org/2000/svg" id="sub-chart-svg"></svg>
+      </div>
+    </div>
+
+    <div class="info-card tip">
+      <span class="info-label">Pro Tip</span>
+      <p><span class="mono">fig.tight_layout()</span> automatically adjusts spacing so titles and labels in a grid don't overlap each other — cheap to add, and almost always worth adding.</p>
+    </div>
+
+    <div class="info-card mistake">
+      <span class="info-label">Common Mistake</span>
+      <p>With <span class="mono">plt.subplots(1, n)</span>, <span class="mono">axes</span> comes back as a plain 1-D array, not 2-D — so <span class="mono">axes[0, 1]</span> raises an error where <span class="mono">axes[1]</span> was needed. The indexing shape depends on how many rows and columns you asked for.</p>
+    </div>
+
+    <div class="step-label">Practice challenge</div>
+    <div class="quiz-block">
+      <div class="quiz-q">With <span class="mono">fig, axes = plt.subplots(2, 2)</span>, how do you reach the top-right chart?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'qs5')">axes[0, 1]</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'qs5')">axes[1, 0]</button>
+      </div>
+      <div class="quiz-feedback" id="qs5-feedback"></div>
+    </div>
+
+    <div class="step-label">Summary</div>
+    <p class="body-text">You can now lay out multiple related charts in one figure. Next: making any single chart actually look intentional.</p>
+  </div>
+</section>
+
+<section class="chapter" id="s6">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Section 06</span><span class="ch-badge">Live styler</span></div>
+    <h2 class="ch-title">Styling &amp; Annotation</h2>
+
+    <div class="step-label">Color, linestyle &amp; markers</div>
+    <p class="body-text">Every visual property of a line is a keyword argument on <span class="mono">plot()</span> — nothing separate to learn.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body">ax.plot(days, temps[<span class="str">2</span>], color=<span class="str">"#22d3ee"</span>, linestyle=<span class="str">"--"</span>, marker=<span class="str">"s"</span>, linewidth=<span class="str">2</span>, label=<span class="str">"Oslo"</span>)
+ax.legend()</pre>
+    </div>
+
+    <div class="step-label">Style builder — interactive</div>
+    <p class="body-text">Style Oslo's week live — every control maps directly to a keyword argument above.</p>
+    <div class="playground">
+      <div class="pg-controls">
+        <div class="pg-field"><label>Color</label>
+          <div class="color-swatch-row" id="style-colors"></div>
+        </div>
+        <div class="pg-field"><label>Linestyle</label>
+          <select id="style-linestyle" onchange="applyStyle()">
+            <option value="solid">"-"</option>
+            <option value="dashed">"--"</option>
+            <option value="dotted">":"</option>
+          </select>
+        </div>
+        <div class="pg-field"><label>Marker</label>
+          <select id="style-marker" onchange="applyStyle()">
+            <option value="o">"o" circle</option>
+            <option value="s">"s" square</option>
+            <option value="none">none</option>
+          </select>
+        </div>
+        <div class="pg-field"><label>Gridlines</label>
+          <select id="style-grid" onchange="applyStyle()">
+            <option value="on">ax.grid(True)</option>
+            <option value="off" selected>off</option>
+          </select>
+        </div>
+      </div>
+      <div class="chart-shell">
+        <svg class="chart-svg" viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" id="style-chart-svg"></svg>
+      </div>
+    </div>
+
+    <div class="step-label">Annotating a specific point</div>
+    <p class="body-text"><span class="mono">ax.annotate()</span> labels one exact point — useful for calling out a maximum, minimum, or anomaly instead of leaving the reader to hunt for it.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body">peak_day = temps[<span class="str">1</span>].argmax()
+ax.annotate(<span class="str">f"Peak: {temps[1][peak_day]}\u00b0C"</span>,
+            xy=(peak_day, temps[<span class="str">1</span>][peak_day]),
+            xytext=(peak_day, temps[<span class="str">1</span>][peak_day] + <span class="str">3</span>),
+            arrowprops=<span class="fn">dict</span>(arrowstyle=<span class="str">"->"</span>))</pre>
+      <div class="code-output"><div class="out-label">Output</div><pre>(an arrow pointing at Cairo's hottest day, labeled "Peak: 33°C")</pre></div>
+    </div>
+
+    <div class="info-card usecase">
+      <span class="info-label">Real-World Use Case</span>
+      <p>A chart handed to someone else — a report, a slide, a dashboard — needs a title, axis labels, and (with more than one series) a legend to be understood without you standing next to it explaining it.</p>
+    </div>
+
+    <div class="step-label">Practice challenge</div>
+    <div class="quiz-block">
+      <div class="quiz-q">What does <span class="mono">label="Oslo"</span> inside <span class="mono">ax.plot()</span> do by itself?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'qs6')">Immediately shows "Oslo" next to the line</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'qs6')">Nothing visible yet — it only appears once ax.legend() is called</button>
+      </div>
+      <div class="quiz-feedback" id="qs6-feedback"></div>
+    </div>
+
+    <div class="step-label">Summary</div>
+    <p class="body-text">You can now style and annotate a chart with intent. Next: comparing every city at once, and getting a figure out of Python entirely.</p>
+  </div>
+</section>
+
+<section class="chapter" id="s7">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Section 07</span><span class="ch-badge">Live comparison</span></div>
+    <h2 class="ch-title">Multi-Series Plots &amp; Saving</h2>
+
+    <div class="step-label">Every city, one chart</div>
+    <p class="body-text">Calling <span class="mono">ax.plot()</span> multiple times on the same Axes overlays every line together — a legend is what keeps them distinguishable.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button><button class="code-btn run-btn" onclick="runCode(this)">Run</button></div></div>
+      <pre class="code-body">fig, ax = plt.subplots(figsize=(<span class="str">8</span>, <span class="str">5</span>))
+<span class="kw">for</span> i, city <span class="kw">in</span> <span class="fn">enumerate</span>(cities):
+    ax.plot(days, temps[i], marker=<span class="str">"o"</span>, label=city)
+ax.set_title(<span class="str">"Weekly Temperatures — All Cities"</span>)
+ax.legend()
+plt.show()</pre>
+    </div>
+
+    <div class="step-label">Toggle cities on the comparison chart — interactive</div>
+    <div class="playground">
+      <div class="pg-controls" id="multi-toggles"></div>
+      <div class="chart-shell">
+        <svg class="chart-svg" viewBox="0 0 640 320" xmlns="http://www.w3.org/2000/svg" id="multi-chart-svg"></svg>
+      </div>
+    </div>
+
+    <div class="step-label">Saving a figure</div>
+    <p class="body-text">A figure isn't just for the screen — <span class="mono">savefig()</span> exports it as a file, ready to drop into a report or a slide deck.</p>
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">notebook cell</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button></div></div>
+      <pre class="code-body">fig.savefig(<span class="str">"weekly_temperatures.png"</span>, dpi=<span class="str">300</span>, bbox_inches=<span class="str">"tight"</span>)</pre>
+    </div>
+    <table class="dim-table">
+      <tr><th>Parameter</th><th>What it controls</th></tr>
+      <tr><td class="dim-name">dpi</td><td>Resolution — higher for print, lower is fine for screens</td></tr>
+      <tr><td class="dim-name">bbox_inches="tight"</td><td>Trims extra whitespace around the figure</td></tr>
+      <tr><td class="dim-name">File extension</td><td>Format — .png, .pdf, .svg all work from the same call</td></tr>
+    </table>
+
+    <div class="info-card mistake">
+      <span class="info-label">Common Mistake</span>
+      <p>Calling <span class="mono">plt.show()</span> before <span class="mono">fig.savefig()</span>. In some environments, showing a figure clears it from memory — the saved file comes out blank. Save first, or save and show as two independent calls.</p>
+    </div>
+
+    <div class="step-label">Practice challenge</div>
+    <div class="quiz-block">
+      <div class="quiz-q">Without <span class="mono">ax.legend()</span>, what happens to five overlaid <span class="mono">label=</span> arguments?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'qs7')">Matplotlib shows them automatically regardless</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'qs7')">They're stored but never displayed until legend() is called</button>
+      </div>
+      <div class="quiz-feedback" id="qs7-feedback"></div>
+    </div>
+
+    <div class="step-label">Summary</div>
+    <p class="body-text">You now have the full core toolkit: building, choosing chart types, laying out subplots, styling, annotating, comparing series, and exporting. Next: all seven, applied end-to-end.</p>
+  </div>
+</section>
+
+<section class="chapter" id="workflow">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Case Study</span><span class="ch-badge">End to end</span></div>
+    <h2 class="ch-title">The Full Workflow, Start to Finish</h2>
+    <p class="body-text">Same dataset, one continuous script — every step is something you already built in this note, chained together into the figure you'd actually hand someone.</p>
+
+    <div class="code-block">
+      <div class="code-head"><div class="left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">full_workflow.py</span></div><div class="code-actions"><button class="code-btn" onclick="copyCode(this)">Copy</button></div></div>
+      <pre class="code-body"><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cmt"># 1. The data (from the NumPy note)</span>
+cities = [<span class="str">"Tokyo"</span>, <span class="str">"Cairo"</span>, <span class="str">"Oslo"</span>, <span class="str">"Lima"</span>, <span class="str">"Nairobi"</span>]
+days = [<span class="str">"Mon"</span>, <span class="str">"Tue"</span>, <span class="str">"Wed"</span>, <span class="str">"Thu"</span>, <span class="str">"Fri"</span>, <span class="str">"Sat"</span>, <span class="str">"Sun"</span>]
+temps = np.array([
+    [<span class="str">18</span>, <span class="str">19</span>, <span class="str">21</span>, <span class="str">20</span>, <span class="str">22</span>, <span class="str">23</span>, <span class="str">21</span>],
+    [<span class="str">29</span>, <span class="str">31</span>, <span class="str">30</span>, <span class="str">33</span>, <span class="str">32</span>, <span class="str">30</span>, <span class="str">28</span>],
+    [<span class="str">4</span>,  <span class="str">3</span>,  <span class="str">5</span>,  <span class="str">2</span>,  <span class="str">6</span>,  <span class="str">4</span>,  <span class="str">3</span>],
+    [<span class="str">17</span>, <span class="str">18</span>, <span class="str">16</span>, <span class="str">19</span>, <span class="str">18</span>, <span class="str">17</span>, <span class="str">19</span>],
+    [<span class="str">24</span>, <span class="str">23</span>, <span class="str">25</span>, <span class="str">24</span>, <span class="str">26</span>, <span class="str">25</span>, <span class="str">24</span>],
+])
+
+<span class="cmt"># 2. Build a 2x2 figure: trend, comparison, distribution, relationship</span>
+fig, axes = plt.subplots(<span class="str">2</span>, <span class="str">2</span>, figsize=(<span class="str">12</span>, <span class="str">8</span>))
+
+<span class="cmt"># 3. Top-left: every city's week overlaid (multi-series line)</span>
+<span class="kw">for</span> i, city <span class="kw">in</span> <span class="fn">enumerate</span>(cities):
+    axes[<span class="str">0</span>, <span class="str">0</span>].plot(days, temps[i], marker=<span class="str">"o"</span>, label=city)
+axes[<span class="str">0</span>, <span class="str">0</span>].set_title(<span class="str">"Weekly Temperatures"</span>)
+axes[<span class="str">0</span>, <span class="str">0</span>].set_ylabel(<span class="str">"\u00b0C"</span>)
+axes[<span class="str">0</span>, <span class="str">0</span>].legend(fontsize=<span class="str">8</span>)
+
+<span class="cmt"># 4. Top-right: average per city (bar)</span>
+city_avg = temps.mean(axis=<span class="str">1</span>)
+axes[<span class="str">0</span>, <span class="str">1</span>].bar(cities, city_avg, color=<span class="str">"#22d3ee"</span>)
+axes[<span class="str">0</span>, <span class="str">1</span>].set_title(<span class="str">"Average Temperature by City"</span>)
+
+<span class="cmt"># 5. Bottom-left: spread of all 35 readings (histogram)</span>
+axes[<span class="str">1</span>, <span class="str">0</span>].hist(temps.flatten(), bins=<span class="str">7</span>, color=<span class="str">"#a78bfa"</span>)
+axes[<span class="str">1</span>, <span class="str">0</span>].set_title(<span class="str">"Distribution of All Readings"</span>)
+axes[<span class="str">1</span>, <span class="str">0</span>].set_xlabel(<span class="str">"\u00b0C"</span>)
+
+<span class="cmt"># 6. Bottom-right: average vs volatility (scatter)</span>
+city_std = temps.std(axis=<span class="str">1</span>)
+axes[<span class="str">1</span>, <span class="str">1</span>].scatter(city_avg, city_std, s=<span class="str">80</span>)
+<span class="kw">for</span> i, city <span class="kw">in</span> <span class="fn">enumerate</span>(cities):
+    axes[<span class="str">1</span>, <span class="str">1</span>].annotate(city, (city_avg[i], city_std[i]))
+axes[<span class="str">1</span>, <span class="str">1</span>].set_title(<span class="str">"Average vs Day-to-Day Swing"</span>)
+
+<span class="cmt"># 7. Clean up spacing and export</span>
+fig.tight_layout()
+fig.savefig(<span class="str">"weekly_report.png"</span>, dpi=<span class="str">300</span>, bbox_inches=<span class="str">"tight"</span>)
+plt.show()</pre>
+    </div>
+
+    <div class="step-label">The resulting figure</div>
+    <div class="chart-shell">
+      <svg class="chart-svg" viewBox="0 0 660 460" xmlns="http://www.w3.org/2000/svg" id="workflow-chart-svg"></svg>
+    </div>
+
+    <div class="step-label">Insights — computed live from this note's real dataset</div>
+    <div class="insight-qa">
+      <div class="qa-item"><div class="qa-q">Which chart in the grid answers "is Cairo trending up or down this week?"</div><div class="qa-a" id="qa-1"></div></div>
+      <div class="qa-item"><div class="qa-q">Which city has the hottest weekly average?</div><div class="qa-a" id="qa-2"></div></div>
+      <div class="qa-item"><div class="qa-q">Which city's line is flattest — the most consistent week?</div><div class="qa-a" id="qa-3"></div></div>
+      <div class="qa-item"><div class="qa-q">Why does the histogram look split into separate clumps?</div><div class="qa-a" id="qa-4"></div></div>
+      <div class="qa-item"><div class="qa-q">Which single point would be worth annotating with an arrow?</div><div class="qa-a" id="qa-5"></div></div>
+      <div class="qa-item">
+        <div class="qa-q">Full city ranking by weekly average, as the bar chart orders it</div>
+        <div id="qa-6-table"></div>
+      </div>
+    </div>
+    <p class="body-text" style="font-size:13px; color:var(--text-faint);">Every answer above is computed live from this exact 5&times;7 array &mdash; not scripted text. Re-derive it yourself against the code above.</p>
+  </div>
+</section>
+
+<section class="chapter" id="practice">
+  <div class="wrap">
+    <div class="ch-meta"><span class="ch-eyebrow">Practice</span><span class="ch-badge">20 questions</span></div>
+    <h2 class="ch-title">Practice Questions</h2>
+    <p class="body-text">Twenty questions, spanning everything from Section 1 to Section 7. Instant feedback, every time.</p>
+
+    <div class="quiz-block"><span class="quiz-tag">Core Concepts</span>
+      <div class="quiz-q">What's the relationship between a Figure and an Axes?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p1')">The Figure is the whole canvas; an Axes is one plot inside it</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p1')">They're two names for the same object</button>
+      </div>
+      <div class="quiz-feedback" id="p1-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Core Concepts</span>
+      <div class="quiz-q">What does <span class="mono">"Axes"</span> refer to in Matplotlib?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p2')">A single complete plot area, not the x/y lines themselves</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p2')">The plural of "axis" — just the x and y lines</button>
+      </div>
+      <div class="quiz-feedback" id="p2-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Select the Correct Function</span>
+      <div class="quiz-q">Which creates a figure and a single Axes in one line?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p3')">fig, ax = plt.subplots()</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p3')">fig, ax = plt.figure()</button>
+      </div>
+      <div class="quiz-feedback" id="p3-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Select the Correct Function</span>
+      <div class="quiz-q">Which shows the spread of one continuous variable?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p4')">ax.hist()</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p4')">ax.bar()</button>
+      </div>
+      <div class="quiz-feedback" id="p4-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Select the Correct Function</span>
+      <div class="quiz-q">Which labels one specific point with text and an arrow?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p5')">ax.annotate()</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p5')">ax.set_title()</button>
+      </div>
+      <div class="quiz-feedback" id="p5-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Chart Choice</span>
+      <div class="quiz-q">You're plotting temperature across seven ordered days. Best chart?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p6')">Line plot — the days have a meaningful order</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p6')">Scatter plot — never connect data points</button>
+      </div>
+      <div class="quiz-feedback" id="p6-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Chart Choice</span>
+      <div class="quiz-q">You're comparing five unrelated cities' averages. Best chart?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p7')">Bar chart — distinct categories, no order between them</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p7')">Line chart connecting the five cities</button>
+      </div>
+      <div class="quiz-feedback" id="p7-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Chart Choice</span>
+      <div class="quiz-q">Bar chart or histogram — which has bars that touch each other?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p8')">Histogram — its bins are adjacent ranges of one variable</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p8')">Bar chart — its categories are adjacent</button>
+      </div>
+      <div class="quiz-feedback" id="p8-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Find the Error</span>
+      <div class="quiz-q">Five lines are drawn with <span class="mono">label=</span> but no legend appears. Why?</div>
+      <pre class="quiz-code"><span class="kw">for</span> i, city <span class="kw">in</span> <span class="fn">enumerate</span>(cities):
+    ax.plot(days, temps[i], label=city)
+plt.show()</pre>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p9')">ax.legend() was never called</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p9')">label= only works on scatter(), not plot()</button>
+      </div>
+      <div class="quiz-feedback" id="p9-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Find the Error</span>
+      <div class="quiz-q">This raises an error. Why?</div>
+      <pre class="quiz-code">fig, axes = plt.subplots(<span class="str">1</span>, <span class="str">3</span>)
+axes[<span class="str">0</span>, <span class="str">1</span>].plot(days, temps[<span class="str">0</span>])</pre>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p10')">With one row, axes is 1-D — it needs axes[1], not axes[0, 1]</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p10')">subplots() can't take 1 as a row count</button>
+      </div>
+      <div class="quiz-feedback" id="p10-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Find the Error</span>
+      <div class="quiz-q">A saved PNG comes out blank. What's the likely cause?</div>
+      <pre class="quiz-code">plt.show()
+fig.savefig(<span class="str">"out.png"</span>)</pre>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p11')">show() ran first and cleared the figure — save before showing</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p11')">savefig() only supports PDF</button>
+      </div>
+      <div class="quiz-feedback" id="p11-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Find the Error</span>
+      <div class="quiz-q">A script runs cleanly but no window ever appears. What's missing?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p12')">plt.show() — the figure was built but never displayed</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p12')">Nothing — plots can't be shown from a .py file</button>
+      </div>
+      <div class="quiz-feedback" id="p12-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Complete the Code</span>
+      <div class="quiz-q">Fill in the blank to label the vertical axis:</div>
+      <pre class="quiz-code">ax.________(<span class="str">"Temperature (\u00b0C)"</span>)</pre>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p13')">set_ylabel</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p13')">set_xlabel</button>
+      </div>
+      <div class="quiz-feedback" id="p13-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Complete the Code</span>
+      <div class="quiz-q">Fill in the blank to make the line dashed:</div>
+      <pre class="quiz-code">ax.plot(days, temps[<span class="str">0</span>], linestyle=<span class="str">"____"</span>)</pre>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p14')">--</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p14')">dash</button>
+      </div>
+      <div class="quiz-feedback" id="p14-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Complete the Code</span>
+      <div class="quiz-q">Fill in the blank to build a 2&times;3 grid of plots:</div>
+      <pre class="quiz-code">fig, axes = plt.subplots(____, ____)</pre>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p15')">2, 3 — rows first, then columns</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p15')">3, 2 — columns first, then rows</button>
+      </div>
+      <div class="quiz-feedback" id="p15-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Subplots</span>
+      <div class="quiz-q">What does <span class="mono">fig.tight_layout()</span> do?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p16')">Adjusts spacing so titles and labels stop overlapping</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p16')">Shrinks the figure to the smallest possible size</button>
+      </div>
+      <div class="quiz-feedback" id="p16-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Histograms</span>
+      <div class="quiz-q">Why does raising <span class="mono">bins</span> from 5 to 15 change the shape of a histogram?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p17')">The same values get divided into narrower ranges, so counts redistribute</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p17')">It adds more data points to the dataset</button>
+      </div>
+      <div class="quiz-feedback" id="p17-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Saving</span>
+      <div class="quiz-q">What does <span class="mono">bbox_inches="tight"</span> do in <span class="mono">savefig()</span>?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p18')">Trims excess whitespace around the figure's edges</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p18')">Compresses the file to a smaller size</button>
+      </div>
+      <div class="quiz-feedback" id="p18-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Styling</span>
+      <div class="quiz-q">Why is relying on color alone to distinguish five lines a weak choice?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p19')">It fails in grayscale printing and for colorblind readers — vary markers or linestyles too</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p19')">Matplotlib only supports four colors at a time</button>
+      </div>
+      <div class="quiz-feedback" id="p19-feedback"></div>
+    </div>
+
+    <div class="quiz-block"><span class="quiz-tag">Judgment</span>
+      <div class="quiz-q">A bar chart of city averages starts its y-axis at 15 instead of 0. What's the risk?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answerQuiz(this, true, 'p20')">Truncating the axis visually exaggerates differences between bars</button>
+        <button class="quiz-opt" onclick="answerQuiz(this, false, 'p20')">None — the axis start never affects interpretation</button>
+      </div>
+      <div class="quiz-feedback" id="p20-feedback"></div>
+    </div>
+  </div>
+</section>
+
+<section id="final-summary">
+  <div class="wrap" style="text-align:center;">
+    <h2 class="ch-title">From Arrays to Figures</h2>
+    <div class="roadmap-flow" style="justify-content:center;">
+      <span class="roadmap-step">Why Matplotlib</span><span class="roadmap-arrow">&rarr;</span>
+      <span class="roadmap-step">Plot Anatomy</span><span class="roadmap-arrow">&rarr;</span>
+      <span class="roadmap-step">Line &amp; Scatter</span><span class="roadmap-arrow">&rarr;</span>
+      <span class="roadmap-step">Bars &amp; Histograms</span><span class="roadmap-arrow">&rarr;</span>
+      <span class="roadmap-step">Subplots</span><span class="roadmap-arrow">&rarr;</span>
+      <span class="roadmap-step">Styling &amp; Annotation</span><span class="roadmap-arrow">&rarr;</span>
+      <span class="roadmap-step final">Multi-Series &amp; Saving</span>
+    </div>
+    <p class="pull-quote" style="text-align:left; display:inline-block;">A chart isn't decoration — it's the fastest path from a number nobody reads to a conclusion everybody sees.</p>
+    <p class="body-text" style="margin:0 auto;">NumPy computed it, Pandas organized it, Matplotlib made it readable. That's the full trio &mdash; and the same 5&times;7 array carried all the way through.</p>
+  </div>
+</section>
+
+<footer>Ruhi Practice Hub &mdash; Matplotlib: The Complete Note &middot; All 7 sections, workflow, and 20+ practice questions built. Theme & template taken from Sheryians AI School</footer>
+
+<script>
+  // ---------- theme toggle ----------
+  const sunPath = 'M12 4.5V2M12 22v-2.5M4.5 12H2M22 12h-2.5M5.6 5.6 4 4M20 20l-1.6-1.6M18.4 5.6 20 4M4 20l1.6-1.6M12 8a4 4 0 100 8 4 4 0 000-8z';
+  const moonPath = 'M21 12.8A9 9 0 1111.2 3 7 7 0 0021 12.8z';
+  const icon = document.getElementById('theme-icon');
+  function setIcon(t){ icon.innerHTML = '<path d="' + (t === 'dark' ? sunPath : moonPath) + '"/>'; }
+  setIcon('dark');
+  function toggleTheme(){
+    const html = document.documentElement;
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    setIcon(next);
+  }
+
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement;
+    document.getElementById('progress-bar').style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight) * 100) + '%';
+    document.getElementById('back-to-top').classList.toggle('show', h.scrollTop > 600);
+  });
+
+  const ecoNodes = document.querySelectorAll('.eco-node');
+  const ecoPaths = document.querySelectorAll('.eco-path');
+  const ecoObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting){
+      ecoNodes.forEach((n,i) => setTimeout(()=>n.classList.add('visible'), i*100));
+      ecoPaths.forEach((p,i) => setTimeout(()=>p.classList.add('visible'), 200+i*100));
+      ecoObserver.disconnect();
+    }});
+  }, { threshold: 0.3 });
+  document.querySelectorAll('.diagram-shell').forEach(el => ecoObserver.observe(el));
+
+  function copyCode(btn){
+    const code = btn.closest('.code-block').querySelector('.code-body').innerText;
+    navigator.clipboard.writeText(code);
+    const old = btn.innerText; btn.innerText = 'Copied';
+    setTimeout(()=>btn.innerText = old, 1200);
+  }
+  function runCode(btn){
+    const out = btn.closest('.code-block').querySelector('.code-output');
+    if (out) out.classList.add('show');
+  }
+
+  // ---------- dataset ----------
+  const cities = ['Tokyo','Cairo','Oslo','Lima','Nairobi'];
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const temps = [
+    [18,19,21,20,22,23,21],
+    [29,31,30,33,32,30,28],
+    [4, 3, 5, 2, 6, 4, 3],
+    [17,18,16,19,18,17,19],
+    [24,23,25,24,26,25,24],
+  ];
+  const palette = ['#22d3ee','#f472b6','#a78bfa','#facc15','#34d399'];
+  const mean = a => a.reduce((x,y)=>x+y,0)/a.length;
+  const std  = a => { const m = mean(a); return Math.sqrt(mean(a.map(v=>(v-m)**2))); };
+
+  // ---------- tiny SVG chart engine ----------
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs, text){
+    const n = document.createElementNS(SVGNS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+  // returns {x, y} scale fns for a plot box
+  function makeScales(box, xCount, yMin, yMax){
+    const xStep = xCount > 1 ? (box.w) / (xCount - 1) : 0;
+    return {
+      x: i => box.x + i * xStep,
+      xBand: (i, n) => box.x + (box.w / n) * (i + 0.5),
+      y: v => box.y + box.h - ((v - yMin) / (yMax - yMin || 1)) * box.h,
+    };
+  }
+  function drawFrame(svg, box, opts){
+    opts = opts || {};
+    const { yMin, yMax, yTicks = 4, xLabels, title, xlabel, ylabel, grid } = opts;
+    if (title) svg.appendChild(el('text', { x: box.x + box.w/2, y: box.y - 16, class:'chart-title', 'text-anchor':'middle' }, title));
+    for (let i = 0; i <= yTicks; i++){
+      const v = yMin + (yMax - yMin) * i / yTicks;
+      const yy = box.y + box.h - (box.h * i / yTicks);
+      if (grid) svg.appendChild(el('line', { x1: box.x, y1: yy, x2: box.x + box.w, y2: yy, class:'chart-grid' }));
+      svg.appendChild(el('text', { x: box.x - 8, y: yy + 3.5, class:'chart-tick', 'text-anchor':'end' }, Math.round(v)));
+    }
+    svg.appendChild(el('line', { x1: box.x, y1: box.y, x2: box.x, y2: box.y + box.h, class:'chart-axis' }));
+    svg.appendChild(el('line', { x1: box.x, y1: box.y + box.h, x2: box.x + box.w, y2: box.y + box.h, class:'chart-axis' }));
+    if (xLabels){
+      const n = xLabels.length;
+      xLabels.forEach((lbl, i) => {
+        const xx = opts.band ? box.x + (box.w/n)*(i+0.5) : box.x + (n>1 ? box.w*i/(n-1) : 0);
+        svg.appendChild(el('text', { x: xx, y: box.y + box.h + 18, class:'chart-tick', 'text-anchor':'middle' }, lbl));
+      });
+    }
+    if (xlabel) svg.appendChild(el('text', { x: box.x + box.w/2, y: box.y + box.h + 40, class:'chart-label', 'text-anchor':'middle' }, xlabel));
+    if (ylabel) svg.appendChild(el('text', { x: box.x - 42, y: box.y + box.h/2, class:'chart-label', 'text-anchor':'middle', transform:`rotate(-90 ${box.x-42} ${box.y+box.h/2})` }, ylabel));
+  }
+  function niceBounds(vals, pad){
+    const lo = Math.min(...vals), hi = Math.max(...vals);
+    const p = pad === undefined ? (hi - lo) * 0.15 || 1 : pad;
+    return { yMin: Math.floor(lo - p), yMax: Math.ceil(hi + p) };
+  }
+  function clearSvg(id){ const s = document.getElementById(id); if (s) s.innerHTML=''; return s; }
+  function drawLineSeries(svg, sc, data, color, opts){
+    opts = opts || {};
+    const pts = data.map((v,i) => `${sc.x(i)},${sc.y(v)}`).join(' ');
+    const dash = opts.linestyle === 'dashed' ? '7 5' : opts.linestyle === 'dotted' ? '2 5' : null;
+    const attrs = { points: pts, fill:'none', stroke: color, 'stroke-width': opts.width || 2.5, 'stroke-linejoin':'round', 'stroke-linecap':'round' };
+    if (dash) attrs['stroke-dasharray'] = dash;
+    const poly = el('polyline', attrs);
+    svg.appendChild(poly);
+    const len = 700;
+    poly.style.strokeDasharray = dash || len;
+    if (!dash){ poly.style.strokeDashoffset = len; poly.style.transition = 'stroke-dashoffset .8s ease'; requestAnimationFrame(()=>{ poly.style.strokeDashoffset = 0; }); }
+    if (opts.marker && opts.marker !== 'none'){
+      data.forEach((v,i) => {
+        if (opts.marker === 's') svg.appendChild(el('rect', { x: sc.x(i)-4, y: sc.y(v)-4, width:8, height:8, rx:1.5, fill: color }));
+        else svg.appendChild(el('circle', { cx: sc.x(i), cy: sc.y(v), r: 4.5, fill: color }));
+      });
+    }
+  }
+  function legendHTML(items, kind){
+    return '<div class="legend-row">' + items.map(it =>
+      `<span class="legend-item"><span class="${kind==='dot'?'legend-dot':'legend-swatch'}" style="background:${it.color}"></span>${it.label}</span>`
+    ).join('') + '</div>';
+  }
+
+  // ---------- s1: hero chart ----------
+  function drawHeroChart(){
+    const svg = clearSvg('hero-chart-svg'); if (!svg) return;
+    const box = { x:60, y:40, w:540, h:180 };
+    const b = niceBounds(temps[0]);
+    drawFrame(svg, box, { ...b, xLabels: days, title:'Tokyo — 7 Day Forecast', ylabel:'°C', grid:true });
+    drawLineSeries(svg, makeScales(box, 7, b.yMin, b.yMax), temps[0], palette[0], { marker:'o' });
+  }
+
+  // ---------- s2: anatomy chart ----------
+  let anatomyPart = 'figure';
+  function showPlotAnatomy(part, btn){
+    if (btn){ btn.closest('.playground').querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
+    anatomyPart = part;
+    drawAnatomyChart();
+    const d = {
+      figure: 'The <strong class="emph">Figure</strong> is the entire canvas — everything inside this border. Created with <span class="mono">plt.subplots()</span> or <span class="mono">plt.figure()</span>, and the thing <span class="mono">savefig()</span> exports.',
+      axes:   'The <strong class="emph">Axes</strong> is one plot region inside the Figure. Almost every method you call — <span class="mono">plot</span>, <span class="mono">set_title</span>, <span class="mono">legend</span> — belongs to it.',
+      title:  'The <strong class="emph">title</strong>, set with <span class="mono">ax.set_title("...")</span>. It belongs to the Axes, not the Figure — <span class="mono">fig.suptitle()</span> is the Figure-level equivalent.',
+      xlabel: 'The <strong class="emph">x-axis</strong> and its label, set with <span class="mono">ax.set_xlabel("Day")</span>. The tick labels below it come from the data you passed in.',
+      ylabel: 'The <strong class="emph">y-axis</strong> and its label, set with <span class="mono">ax.set_ylabel("°C")</span>. Its range is auto-scaled unless you call <span class="mono">ax.set_ylim()</span>.',
+      line:   'The <strong class="emph">line</strong> itself — a Line2D object returned by <span class="mono">ax.plot()</span>. Its color, width, style, and markers are all keyword arguments.',
+      legend: 'The <strong class="emph">legend</strong>, drawn by <span class="mono">ax.legend()</span> using each series\' <span class="mono">label=</span>. Without that call, the labels exist but stay invisible.',
+    };
+    document.getElementById('anatomy-chart-desc').innerHTML = d[part];
+  }
+  function drawAnatomyChart(){
+    const svg = clearSvg('anatomy-chart-svg'); if (!svg) return;
+    const P = anatomyPart;
+    const dim = k => (P === 'figure' || P === k) ? '' : ' dim';
+    const hl  = k => P === k ? ' hl' : '';
+    // figure border
+    const figG = el('g', { class: 'anatomy-part' + (P==='figure' ? ' hl' : '') });
+    figG.appendChild(el('rect', { x:8, y:8, width:624, height:304, rx:10, fill:'none', stroke: P==='figure'?'var(--accent)':'var(--border)', 'stroke-width': P==='figure'?2.5:1.5, 'stroke-dasharray':'6 4' }));
+    figG.appendChild(el('text', { x:18, y:26, class:'chart-label', fill: P==='figure'?'var(--accent)':'var(--text-faint)' }, 'Figure'));
+    svg.appendChild(figG);
+    const box = { x:86, y:66, w:440, h:170 };
+    // axes region
+    const axG = el('g', { class:'anatomy-part' + hl('axes') + dim('axes') });
+    axG.appendChild(el('rect', { x:box.x, y:box.y, width:box.w, height:box.h, fill: P==='axes'?'rgba(34,211,238,.09)':'none', stroke: P==='axes'?'var(--accent)':'none', 'stroke-width':2.5 }));
+    svg.appendChild(axG);
+    const b = niceBounds(temps[0]);
+    const sc = makeScales(box, 7, b.yMin, b.yMax);
+    // y ticks + axis
+    const yG = el('g', { class:'anatomy-part' + hl('ylabel') + dim('ylabel') });
+    for (let i=0;i<=4;i++){
+      const v = b.yMin + (b.yMax-b.yMin)*i/4, yy = box.y+box.h-(box.h*i/4);
+      yG.appendChild(el('text', { x:box.x-8, y:yy+3.5, class:'chart-tick', 'text-anchor':'end', fill: P==='ylabel'?'var(--accent)':'var(--text-faint)' }, Math.round(v)));
+    }
+    yG.appendChild(el('line', { x1:box.x, y1:box.y, x2:box.x, y2:box.y+box.h, stroke: P==='ylabel'?'var(--accent)':'var(--text-faint)', 'stroke-width': P==='ylabel'?3:1.5 }));
+    yG.appendChild(el('text', { x:box.x-48, y:box.y+box.h/2, class:'chart-label', 'text-anchor':'middle', fill: P==='ylabel'?'var(--accent)':'var(--text-dim)', transform:`rotate(-90 ${box.x-48} ${box.y+box.h/2})` }, 'Temperature (°C)'));
+    svg.appendChild(yG);
+    // x ticks + axis
+    const xG = el('g', { class:'anatomy-part' + hl('xlabel') + dim('xlabel') });
+    days.forEach((d,i)=> xG.appendChild(el('text', { x:sc.x(i), y:box.y+box.h+18, class:'chart-tick', 'text-anchor':'middle', fill: P==='xlabel'?'var(--accent)':'var(--text-faint)' }, d)));
+    xG.appendChild(el('line', { x1:box.x, y1:box.y+box.h, x2:box.x+box.w, y2:box.y+box.h, stroke: P==='xlabel'?'var(--accent)':'var(--text-faint)', 'stroke-width': P==='xlabel'?3:1.5 }));
+    xG.appendChild(el('text', { x:box.x+box.w/2, y:box.y+box.h+40, class:'chart-label', 'text-anchor':'middle', fill: P==='xlabel'?'var(--accent)':'var(--text-dim)' }, 'Day'));
+    svg.appendChild(xG);
+    // the line
+    const lnG = el('g', { class:'anatomy-part' + dim('line') });
+    lnG.appendChild(el('polyline', { points: temps[0].map((v,i)=>`${sc.x(i)},${sc.y(v)}`).join(' '), fill:'none', stroke: P==='line'?'var(--accent)':palette[0], 'stroke-width': P==='line'?4.5:2.5, 'stroke-linejoin':'round' }));
+    temps[0].forEach((v,i)=> lnG.appendChild(el('circle', { cx:sc.x(i), cy:sc.y(v), r: P==='line'?5.5:4, fill: P==='line'?'var(--accent)':palette[0] })));
+    svg.appendChild(lnG);
+    // title
+    const tG = el('g', { class:'anatomy-part' + dim('title') });
+    tG.appendChild(el('text', { x:box.x+box.w/2, y:box.y-16, class:'chart-title', 'text-anchor':'middle', fill: P==='title'?'var(--accent)':'var(--text)' }, 'Tokyo — 7 Day Forecast'));
+    svg.appendChild(tG);
+    // legend
+    const lgG = el('g', { class:'anatomy-part' + dim('legend') });
+    lgG.appendChild(el('rect', { x:box.x+box.w-92, y:box.y+10, width:82, height:26, rx:6, fill:'var(--card)', stroke: P==='legend'?'var(--accent)':'var(--border)', 'stroke-width': P==='legend'?2.5:1 }));
+    lgG.appendChild(el('line', { x1:box.x+box.w-84, y1:box.y+23, x2:box.x+box.w-66, y2:box.y+23, stroke:palette[0], 'stroke-width':3 }));
+    lgG.appendChild(el('text', { x:box.x+box.w-60, y:box.y+27, class:'chart-tick', fill: P==='legend'?'var(--accent)':'var(--text-dim)' }, 'Tokyo'));
+    svg.appendChild(lgG);
+  }
+
+  // ---------- s3: line vs scatter ----------
+  function applyLineScatter(){
+    const ci = +document.getElementById('ls-city').value;
+    const type = document.getElementById('ls-type').value;
+    document.getElementById('ls-code').innerText = type === 'line'
+      ? `ax.plot(days, temps[${ci}], marker="o", label="${cities[ci]}")`
+      : `ax.scatter(days, temps[${ci}], label="${cities[ci]}")`;
+    const svg = clearSvg('ls-chart-svg'); if (!svg) return;
+    const box = { x:62, y:44, w:538, h:190 };
+    const b = niceBounds(temps[ci]);
+    drawFrame(svg, box, { ...b, xLabels: days, title:`${cities[ci]} — Weekly Temperatures`, ylabel:'°C', grid:true });
+    const sc = makeScales(box, 7, b.yMin, b.yMax);
+    if (type === 'line') drawLineSeries(svg, sc, temps[ci], palette[ci], { marker:'o' });
+    else temps[ci].forEach((v,i)=>{
+      const c = el('circle', { cx: sc.x(i), cy: sc.y(v), r:0, fill: palette[ci] });
+      svg.appendChild(c);
+      setTimeout(()=>{ c.setAttribute('r', 6); c.style.transition='r .3s ease'; }, i*50);
+    });
+  }
+
+  // ---------- s4: bar + histogram ----------
+  function drawBarChart(){
+    const svg = clearSvg('bar-chart-svg'); if (!svg) return;
+    const box = { x:62, y:44, w:538, h:190 };
+    const vals = temps.map(mean);
+    const yMax = Math.ceil(Math.max(...vals) + 4), yMin = 0;
+    drawFrame(svg, box, { yMin, yMax, xLabels: cities, band:true, title:'Average Temperature by City', ylabel:'°C', grid:true });
+    const sc = makeScales(box, 5, yMin, yMax);
+    const bw = (box.w/5) * 0.58;
+    vals.forEach((v,i)=>{
+      const x = sc.xBand(i,5) - bw/2, yTop = sc.y(v), h = box.y + box.h - yTop;
+      const r = el('rect', { x, y: box.y+box.h, width: bw, height: 0, rx:4, fill: palette[i] });
+      svg.appendChild(r);
+      setTimeout(()=>{ r.style.transition='all .5s ease'; r.setAttribute('y', yTop); r.setAttribute('height', h); }, i*70);
+      svg.appendChild(el('text', { x: sc.xBand(i,5), y: yTop - 7, class:'chart-tick', 'text-anchor':'middle' }, v.toFixed(1)));
+    });
+  }
+  function histogram(vals, nbins){
+    const lo = Math.min(...vals), hi = Math.max(...vals);
+    const w = (hi - lo) / nbins;
+    const counts = new Array(nbins).fill(0);
+    vals.forEach(v => { let k = Math.floor((v - lo)/w); if (k >= nbins) k = nbins-1; if (k < 0) k = 0; counts[k]++; });
+    return { counts, lo, hi, w };
+  }
+  function applyHist(){
+    const nbins = Math.max(2, Math.min(15, parseInt(document.getElementById('hist-bins').value)||7));
+    const svg = clearSvg('hist-chart-svg'); if (!svg) return;
+    const flat = temps.flat();
+    const { counts, lo, w } = histogram(flat, nbins);
+    const box = { x:62, y:44, w:538, h:190 };
+    const yMax = Math.max(...counts) + 1;
+    const labels = counts.map((_,i)=> Math.round(lo + i*w));
+    drawFrame(svg, box, { yMin:0, yMax, xLabels: labels, band:true, title:`All 35 Readings — bins=${nbins}`, xlabel:'Temperature (°C)', ylabel:'Count', grid:true });
+    const sc = makeScales(box, nbins, 0, yMax);
+    const bw = box.w/nbins;
+    counts.forEach((c,i)=>{
+      const yTop = sc.y(c), h = box.y+box.h-yTop;
+      const r = el('rect', { x: box.x + i*bw + 0.5, y: box.y+box.h, width: bw-1, height:0, fill:'#a78bfa', stroke:'var(--bg)', 'stroke-width':1 });
+      svg.appendChild(r);
+      setTimeout(()=>{ r.style.transition='all .4s ease'; r.setAttribute('y', yTop); r.setAttribute('height', h); }, i*35);
+    });
+  }
+
+  // ---------- s5: subplots grid ----------
+  function applySubplots(){
+    const rows = Math.max(1, Math.min(3, parseInt(document.getElementById('sub-rows').value)||2));
+    const cols = Math.max(1, Math.min(3, parseInt(document.getElementById('sub-cols').value)||3));
+    document.getElementById('sub-code').innerText = `fig, axes = plt.subplots(${rows}, ${cols}, figsize=(10, 6))\nfig.tight_layout()`;
+    const svg = clearSvg('sub-chart-svg'); if (!svg) return;
+    const W = 640, H = 360, padX = 46, padY = 34;
+    const cw = (W - padX*2) / cols, chh = (H - padY*2) / rows;
+    let k = 0;
+    for (let r = 0; r < rows; r++){
+      for (let c = 0; c < cols; c++){
+        const bx = padX + c*cw + 24, by = padY + r*chh + 26;
+        const bw = cw - 44, bh = chh - 58;
+        if (k < cities.length){
+          const data = temps[k];
+          const b = niceBounds(data);
+          const sc = makeScales({x:bx,y:by,w:bw,h:bh}, 7, b.yMin, b.yMax);
+          svg.appendChild(el('line', { x1:bx, y1:by, x2:bx, y2:by+bh, class:'chart-axis' }));
+          svg.appendChild(el('line', { x1:bx, y1:by+bh, x2:bx+bw, y2:by+bh, class:'chart-axis' }));
+          svg.appendChild(el('text', { x:bx+bw/2, y:by-8, class:'chart-title', 'text-anchor':'middle', 'font-size':'11.5px' }, cities[k]));
+          const poly = el('polyline', { points: data.map((v,i)=>`${sc.x(i)},${sc.y(v)}`).join(' '), fill:'none', stroke: palette[k], 'stroke-width':2, 'stroke-linejoin':'round' });
+          poly.style.opacity = 0; svg.appendChild(poly);
+          setTimeout(()=>{ poly.style.transition='opacity .4s ease'; poly.style.opacity = 1; }, k*90);
+          svg.appendChild(el('text', { x:bx-6, y:by+bh+4, class:'chart-tick', 'text-anchor':'end' }, b.yMin));
+          svg.appendChild(el('text', { x:bx-6, y:by+6, class:'chart-tick', 'text-anchor':'end' }, b.yMax));
+        } else {
+          svg.appendChild(el('rect', { x:bx, y:by, width:bw, height:bh, fill:'none', stroke:'var(--border)', 'stroke-dasharray':'5 4' }));
+          svg.appendChild(el('text', { x:bx+bw/2, y:by+bh/2+4, class:'chart-tick', 'text-anchor':'middle' }, 'empty axes'));
+        }
+        k++;
+      }
+    }
+  }
+
+  // ---------- s6: style builder ----------
+  let styleColor = '#22d3ee';
+  function initStyleColors(){
+    const row = document.getElementById('style-colors'); if (!row) return;
+    row.innerHTML = palette.map((c,i)=>`<span class="color-swatch${i===0?' active':''}" style="background:${c}" onclick="pickColor('${c}', this)"></span>`).join('');
+  }
+  function pickColor(c, elm){
+    styleColor = c;
+    elm.parentElement.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('active'));
+    elm.classList.add('active');
+    applyStyle();
+  }
+  function applyStyle(){
+    const ls = document.getElementById('style-linestyle').value;
+    const mk = document.getElementById('style-marker').value;
+    const grid = document.getElementById('style-grid').value === 'on';
+    const svg = clearSvg('style-chart-svg'); if (!svg) return;
+    const data = temps[2];
+    const box = { x:62, y:44, w:538, h:190 };
+    const b = niceBounds(data);
+    drawFrame(svg, box, { ...b, xLabels: days, title:'Oslo — Styled', ylabel:'°C', grid });
+    drawLineSeries(svg, makeScales(box, 7, b.yMin, b.yMax), data, styleColor, { linestyle: ls, marker: mk });
+    const dashStr = ls === 'dashed' ? '--' : ls === 'dotted' ? ':' : '-';
+    svg.appendChild(el('text', { x:box.x+box.w, y:box.y+box.h+40, class:'chart-label', 'text-anchor':'end' },
+      `color="${styleColor}", linestyle="${dashStr}", marker="${mk==='none'?'None':mk}"`));
+  }
+
+  // ---------- s7: multi-series ----------
+  const multiOn = [true,true,true,true,true];
+  function initMultiToggles(){
+    const c = document.getElementById('multi-toggles'); if (!c) return;
+    c.innerHTML = cities.map((ct,i)=>
+      `<div class="pg-field"><label>${ct}</label><select onchange="toggleMulti(${i}, this.value)">
+        <option value="on">shown</option><option value="off">hidden</option></select></div>`).join('');
+  }
+  function toggleMulti(i, v){ multiOn[i] = (v === 'on'); drawMulti(); }
+  function drawMulti(){
+    const svg = clearSvg('multi-chart-svg'); if (!svg) return;
+    const shown = temps.filter((_,i)=>multiOn[i]);
+    const box = { x:62, y:48, w:500, h:200 };
+    if (!shown.length){
+      svg.appendChild(el('text', { x:320, y:150, class:'chart-label', 'text-anchor':'middle' }, 'No series selected'));
+      document.querySelector('#multi-chart-svg').parentElement.querySelector('.legend-row')?.remove();
+      return;
+    }
+    const b = niceBounds(shown.flat());
+    drawFrame(svg, box, { ...b, xLabels: days, title:'Weekly Temperatures — All Cities', ylabel:'°C', grid:true });
+    const sc = makeScales(box, 7, b.yMin, b.yMax);
+    temps.forEach((row,i)=>{ if (multiOn[i]) drawLineSeries(svg, sc, row, palette[i], { marker:'o', width:2.2 }); });
+    // inline legend inside svg
+    let ly = box.y + 6;
+    cities.forEach((ct,i)=>{
+      if (!multiOn[i]) return;
+      svg.appendChild(el('line', { x1:box.x+box.w+14, y1:ly, x2:box.x+box.w+32, y2:ly, stroke:palette[i], 'stroke-width':3 }));
+      svg.appendChild(el('text', { x:box.x+box.w+38, y:ly+4, class:'chart-tick' }, ct));
+      ly += 20;
+    });
+  }
+
+  // ---------- workflow 2x2 figure ----------
+  function drawWorkflowFigure(){
+    const svg = clearSvg('workflow-chart-svg'); if (!svg) return;
+    const cellW = 300, cellH = 190, ox = 50, oy = 36, gapX = 30, gapY = 56;
+    // [0,0] multi-line
+    (function(){
+      const box = { x:ox, y:oy, w:cellW-60, h:cellH-60 };
+      const b = niceBounds(temps.flat());
+      drawFrame(svg, box, { ...b, yTicks:3, xLabels:['M','T','W','T','F','S','S'], title:'Weekly Temperatures', grid:true });
+      const sc = makeScales(box, 7, b.yMin, b.yMax);
+      temps.forEach((row,i)=> svg.appendChild(el('polyline', { points: row.map((v,j)=>`${sc.x(j)},${sc.y(v)}`).join(' '), fill:'none', stroke:palette[i], 'stroke-width':1.8 })));
+    })();
+    // [0,1] bar
+    (function(){
+      const box = { x: ox+cellW+gapX, y: oy, w: cellW-60, h: cellH-60 };
+      const vals = temps.map(mean), yMax = Math.ceil(Math.max(...vals)+3);
+      drawFrame(svg, box, { yMin:0, yMax, yTicks:3, xLabels:['Tok','Cai','Osl','Lim','Nai'], band:true, title:'Average by City', grid:true });
+      const sc = makeScales(box, 5, 0, yMax), bw = (box.w/5)*0.6;
+      vals.forEach((v,i)=> svg.appendChild(el('rect', { x: sc.xBand(i,5)-bw/2, y: sc.y(v), width:bw, height: box.y+box.h-sc.y(v), rx:3, fill:'#22d3ee' })));
+    })();
+    // [1,0] histogram
+    (function(){
+      const box = { x: ox, y: oy+cellH+gapY, w: cellW-60, h: cellH-60 };
+      const flat = temps.flat(), { counts, lo, w } = histogram(flat, 7);
+      const yMax = Math.max(...counts)+1;
+      drawFrame(svg, box, { yMin:0, yMax, yTicks:3, xLabels: counts.map((_,i)=>Math.round(lo+i*w)), band:true, title:'Distribution of Readings', grid:true });
+      const sc = makeScales(box, 7, 0, yMax), bw = box.w/7;
+      counts.forEach((c,i)=> svg.appendChild(el('rect', { x: box.x+i*bw+0.5, y: sc.y(c), width: bw-1, height: box.y+box.h-sc.y(c), fill:'#a78bfa', stroke:'var(--bg)' })));
+    })();
+    // [1,1] scatter
+    (function(){
+      const box = { x: ox+cellW+gapX, y: oy+cellH+gapY, w: cellW-60, h: cellH-60 };
+      const avg = temps.map(mean), sd = temps.map(std);
+      const yb = niceBounds(sd, 0.4);
+      const xLo = Math.floor(Math.min(...avg)-3), xHi = Math.ceil(Math.max(...avg)+3);
+      drawFrame(svg, box, { yMin: yb.yMin, yMax: yb.yMax, yTicks:3, xLabels:[xLo, Math.round((xLo+xHi)/2), xHi], title:'Average vs Swing', grid:true });
+      const sy = makeScales(box, 3, yb.yMin, yb.yMax);
+      avg.forEach((a,i)=>{
+        const px = box.x + ((a - xLo)/(xHi - xLo))*box.w;
+        svg.appendChild(el('circle', { cx: px, cy: sy.y(sd[i]), r:5.5, fill: palette[i] }));
+        svg.appendChild(el('text', { x: px, y: sy.y(sd[i])-10, class:'chart-tick', 'text-anchor':'middle' }, cities[i].slice(0,3)));
+      });
+    })();
+  }
+
+  // ---------- workflow insights ----------
+  function renderArrTable(containerId, rows, rowLabels, colLabels){
+    const c = document.getElementById(containerId); if (!c) return;
+    let h = '<div class="df-wrap"><table class="df-table"><thead><tr><th class="df-index-h"></th>';
+    colLabels.forEach(cl => h += `<th style="text-align:right;">${cl}</th>`);
+    h += '</tr></thead><tbody>';
+    rows.forEach((r,i)=>{
+      h += `<tr><td class="df-index">${rowLabels[i]}</td>`;
+      r.forEach(v => h += `<td class="df-cell" style="text-align:right;">${v}</td>`);
+      h += '</tr>';
+    });
+    c.innerHTML = h + '</tbody></table></div>';
+  }
+  function renderWorkflowInsights(){
+    const avg = temps.map(mean), sd = temps.map(std);
+    const hottest = avg.indexOf(Math.max(...avg));
+    const steadiest = sd.indexOf(Math.min(...sd));
+    const dayAvg = days.map((_,j)=> mean(temps.map(r=>r[j])));
+    const peakCity = 1, peakDay = temps[1].indexOf(Math.max(...temps[1]));
+    const flat = temps.flat();
+    document.getElementById('qa-1').innerText = 'The top-left multi-series line chart — it is the only panel that keeps the days in order, which is what makes a trend visible at all.';
+    document.getElementById('qa-2').innerText = `${cities[hottest]} — average ${avg[hottest].toFixed(2)}°C, the tallest bar in the top-right panel.`;
+    document.getElementById('qa-3').innerText = `${cities[steadiest]} — standard deviation of just ${sd[steadiest].toFixed(2)}°C across the week.`;
+    document.getElementById('qa-4').innerText = `Because the cities sit far apart on the scale — readings run from ${Math.min(...flat)}°C to ${Math.max(...flat)}°C, so Oslo's cold week and Cairo's hot one land in separate bins with a gap between them.`;
+    document.getElementById('qa-5').innerText = `${cities[peakCity]} on ${days[peakDay]} at ${temps[peakCity][peakDay]}°C — the single hottest reading in the dataset.`;
+    const order = cities.map((c,i)=>[c, avg[i]]).sort((a,b)=>b[1]-a[1]);
+    renderArrTable('qa-6-table', order.map(([,v])=>[v.toFixed(2)]), order.map(([c])=>c), ['avg_temp']);
+  }
+
+  // ---------- quiz ----------
+  const quizFeedback = {
+    qs1: { correct:'Correct — Matplotlib does no computation; it turns numbers you already have into shapes a human can read at a glance.', wrong:'Not quite — speed is NumPy\'s job. Matplotlib\'s contribution is purely visual: making the numbers legible.' },
+    qs2: { correct:'Right — one Figure can hold a whole grid of Axes, which is exactly what plt.subplots(2, 3) creates.', wrong:'Not quite — a Figure is just the canvas, and it can hold as many Axes as you lay out on it.' },
+    qs3: { correct:'Right — average and volatility are two independent measurements per city, with no inherent order, so a scatter plot fits.', wrong:'Not quite — connecting five cities with a line implies that neighbors are related, which they aren\'t. The cities have no order.' },
+    qs4: { correct:'Right — hist() bins a continuous variable and counts what lands in each range, which is what "spread" means here.', wrong:'Not quite — a bar chart of five city averages hides the 35 individual readings entirely. hist() is what shows their spread.' },
+    qs5: { correct:'Right — the first index is the row and the second is the column, so [0, 1] is top row, second column.', wrong:'Not quite — axes[1, 0] would be the bottom-left chart. Row comes first, then column.' },
+    qs6: { correct:'Right — label= only registers a name for the series; ax.legend() is what actually draws the legend box.', wrong:'Not quite — the label is stored on the line but stays invisible until ax.legend() is called.' },
+    qs7: { correct:'Right — the labels are attached to each line, but nothing renders them until legend() asks for them.', wrong:'Not quite — Matplotlib never draws a legend on its own; it waits for an explicit ax.legend() call.' },
+    p1: { correct:'Right — the Figure is the container, the Axes is a plot inside it. savefig() acts on the Figure; plot() acts on an Axes.', wrong:'Not quite — they\'re distinct objects. One Figure can hold many Axes.' },
+    p2: { correct:'Right — despite the name, an "Axes" is a whole plot region. The individual x and y lines are "axis" objects inside it.', wrong:'Not quite — this is the single most confusing name in the library. "Axes" means one entire plot, not the x/y lines.' },
+    p3: { correct:'Right — plt.subplots() returns a (figure, axes) tuple, which is why the two-name unpacking works.', wrong:'Not quite — plt.figure() returns only a Figure, so unpacking it into two names fails.' },
+    p4: { correct:'Right — hist() bins one continuous variable and counts the values in each bin.', wrong:'Not quite — bar() compares discrete categories. For distribution of a continuous variable, hist() is the tool.' },
+    p5: { correct:'Right — annotate() places text at a given xy coordinate, optionally with an arrow via arrowprops.', wrong:'Not quite — set_title() labels the entire plot, not one specific point within it.' },
+    p6: { correct:'Right — days have a real sequence, so connecting them communicates the trend between consecutive points.', wrong:'Not quite — connecting points is exactly right when they have a meaningful order, which days do.' },
+    p7: { correct:'Right — distinct categories with no ordering between them are what bar charts are for.', wrong:'Not quite — a connecting line would falsely imply that adjacent cities are related to each other.' },
+    p8: { correct:'Right — histogram bins are adjacent slices of one continuous range, so they\'re drawn touching.', wrong:'Not quite — bar chart categories are separate things, so gaps between them are correct. Histogram bins touch.' },
+    p9: { correct:'Right — label= registers a name; ax.legend() is the separate call that actually renders the legend.', wrong:'Not quite — label= works on both plot() and scatter(). The missing piece is the legend() call.' },
+    p10:{ correct:'Right — with a single row, subplots() returns a 1-D array of Axes, so two-index access fails.', wrong:'Not quite — (1, 3) is perfectly valid; the problem is only how the returned axes array is indexed.' },
+    p11:{ correct:'Right — in many backends show() renders and then clears the figure, leaving nothing for savefig() to write.', wrong:'Not quite — savefig() infers format from the file extension and handles PNG fine. The issue is call order.' },
+    p12:{ correct:'Right — in a plain script the figure is built in memory and discarded unless plt.show() displays it.', wrong:'Not quite — scripts display plots fine; they just require the explicit plt.show() that notebooks often imply.' },
+    p13:{ correct:'Right — set_ylabel() labels the vertical axis; set_xlabel() handles the horizontal one.', wrong:'Not quite — set_xlabel() labels the horizontal axis. Temperature is on the vertical one here.' },
+    p14:{ correct:'Right — Matplotlib uses the string shorthands "-", "--", ":" and "-." for line styles.', wrong:'Not quite — the shorthand is the literal string "--". "dash" isn\'t a recognized value (though "dashed" is).' },
+    p15:{ correct:'Right — subplots() takes rows first, then columns, matching NumPy\'s (rows, cols) shape convention.', wrong:'Not quite — the argument order is rows then columns, same as an array shape. (3, 2) would give a 3x2 grid.' },
+    p16:{ correct:'Right — it recalculates padding so overlapping titles and tick labels get room to breathe.', wrong:'Not quite — it adjusts internal spacing between subplots; it doesn\'t shrink the overall figure.' },
+    p17:{ correct:'Right — the data never changes; only how finely it\'s sliced does, which redistributes the counts.', wrong:'Not quite — bins only controls how the existing values are grouped. No data is added or removed.' },
+    p18:{ correct:'Right — it crops the bounding box tightly around the drawn content, removing surrounding whitespace.', wrong:'Not quite — it affects cropping, not compression. File size changes only as a side effect of the smaller canvas.' },
+    p19:{ correct:'Right — redundant encoding (color plus marker or linestyle) keeps a chart readable when color is unavailable.', wrong:'Not quite — Matplotlib supports any number of colors. The concern is purely about accessibility and printing.' },
+    p20:{ correct:'Right — a truncated baseline makes small differences look dramatic. For bar charts, starting at zero is the honest default.', wrong:'Not quite — bar length is what readers compare, so cutting the baseline distorts exactly that comparison.' },
+  };
+  function answerQuiz(btn, isCorrect, groupId){
+    btn.closest('.quiz-opts').querySelectorAll('.quiz-opt').forEach(b => b.disabled = true);
+    btn.classList.add(isCorrect ? 'correct' : 'wrong');
+    const fb = document.getElementById(groupId + '-feedback');
+    fb.classList.add('show');
+    const m = quizFeedback[groupId];
+    fb.innerHTML = m ? (isCorrect ? m.correct : m.wrong) : (isCorrect ? 'Correct!' : 'Not quite.');
+  }
+
+  // ---------- init ----------
+  drawHeroChart();
+  showPlotAnatomy('figure', null);
+  applyLineScatter();
+  drawBarChart();
+  applyHist();
+  applySubplots();
+  initStyleColors();
+  applyStyle();
+  initMultiToggles();
+  drawMulti();
+  drawWorkflowFigure();
+  renderWorkflowInsights();
+</script>
+
+</body>
+</html>
